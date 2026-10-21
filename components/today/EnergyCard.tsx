@@ -11,8 +11,8 @@ import { useEnergy } from "./useEnergy";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-SG");
 
-/** Calorie balance for a day: resting + active burn minus food eaten. */
-export function EnergyCard({ date, activeKcal }: { date: string; activeKcal: number }) {
+/** Calorie balance for a day: calories burned (watch total, or estimated resting burn) minus food eaten. */
+export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: number }) {
   const energy = useEnergy(date);
   const [foodOpen, setFoodOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
@@ -24,7 +24,7 @@ export function EnergyCard({ date, activeKcal }: { date: string; activeKcal: num
     weightKg: energy.weightKg,
     heightCm: energy.heightCm,
     birthYear: energy.birthYear,
-    activeKcal,
+    watchKcal,
     eatenKcal: eaten,
   });
 
@@ -46,18 +46,16 @@ export function EnergyCard({ date, activeKcal }: { date: string; activeKcal: num
       <div className="mx-4 mb-6 rounded-[14px] bg-ios-card p-4">
         <div className="flex items-start justify-between">
           <div className="text-[13px] uppercase text-ios-label2">Calorie balance</div>
-          {!needsStats && (
-            <button type="button" onClick={() => setStatsOpen(true)} className="text-[13px] text-ios-blue">
-              Body stats
-            </button>
-          )}
+          <button type="button" onClick={() => setStatsOpen(true)} className="text-[13px] text-ios-blue">
+            Body stats
+          </button>
         </div>
 
         {!energy.loaded ? (
           <div className="mt-2 h-10 w-40 animate-pulse rounded bg-ios-card2" />
         ) : b.deficit == null ? (
           <div className="mt-2 space-y-2 text-[15px] text-ios-label2">
-            <p>To estimate what you burn, Fitrack needs:</p>
+            <p>Enter your Polar total calories under Activity, or for an estimate add:</p>
             {needsStats && (
               <button type="button" onClick={() => setStatsOpen(true)} className="block font-semibold text-ios-blue">
                 Add your height and birth year ›
@@ -78,25 +76,28 @@ export function EnergyCard({ date, activeKcal }: { date: string; activeKcal: num
           </div>
         )}
 
-        <div className="mt-3 grid grid-cols-3 gap-2 border-t border-ios-sep/70 pt-3 text-center">
+        <div className="mt-3 grid grid-cols-2 gap-2 border-t border-ios-sep/70 pt-3 text-center">
           <div>
-            <div className="text-[17px] font-semibold tabular-nums">{b.resting == null ? "–" : fmt(b.resting)}</div>
-            <div className="text-[12px] text-ios-label2">Resting</div>
+            <div className="text-[17px] font-semibold tabular-nums">{b.burned == null ? "–" : fmt(b.burned)}</div>
+            <div className="text-[12px] text-ios-label2">
+              {b.source === "watch" ? "Burned (Polar)" : b.source === "estimate" ? "Burned (estimate)" : "Burned"}
+            </div>
           </div>
           <div>
-            <div className="text-[17px] font-semibold tabular-nums">+{fmt(b.active)}</div>
-            <div className="text-[12px] text-ios-label2">Active</div>
-          </div>
-          <div>
-            <div className="text-[17px] font-semibold tabular-nums">−{fmt(b.eaten)}</div>
+            <div className="text-[17px] font-semibold tabular-nums">{fmt(b.eaten)}</div>
             <div className="text-[12px] text-ios-label2">Eaten</div>
           </div>
         </div>
+        {b.source === "estimate" && (
+          <p className="mt-3 text-[13px] text-ios-label2">
+            Resting burn only. Enter your Polar total calories under Activity for the real number.
+          </p>
+        )}
       </div>
 
       <Section
         header="Food"
-        footer="Resting burn covers the whole day. Active is your watch's active calories (Activity below). Stash items you eat are added automatically."
+        footer="Stash items you eat are added automatically."
       >
         {energy.foods.map((f) => (
           <Row key={f.id} label={f.name} sub={f.stash_item_id ? "From stash" : undefined}>

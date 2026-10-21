@@ -181,13 +181,13 @@ export function TodayScreen() {
 
       <StreakCard logs={recent} today={today} />
 
-      <EnergyCard date={date} activeKcal={log.kcal_burned} />
+      <EnergyCard date={date} watchKcal={log.kcal_burned} />
 
       <div className={loading ? "pointer-events-none opacity-50" : ""}>
         <Section header="Activity">
           <NumberStepRow label="Steps" value={log.steps} onChange={(v) => update("steps", v)} step={500} max={200000} />
           <NumberStepRow
-            label="Active calories"
+            label="Total calories (Polar)"
             unit="kcal"
             value={log.kcal_burned}
             onChange={(v) => update("kcal_burned", v)}

@@ -15,26 +15,34 @@ describe("ageOn", () => {
 });
 
 describe("energyBalance", () => {
-  const base = { date: "2026-10-21", weightKg: 80, heightCm: 175, birthYear: 2006, activeKcal: 600, eatenKcal: 2000 };
+  const base = { date: "2026-10-21", weightKg: 80, heightCm: 175, birthYear: 2006, watchKcal: 0, eatenKcal: 2000 };
 
-  it("burned = resting + active, deficit = burned - eaten", () => {
-    const b = energyBalance(base);
+  it("uses the watch total as burned, without adding resting burn", () => {
+    const b = energyBalance({ ...base, watchKcal: 3942 });
+    expect(b.source).toBe("watch");
+    expect(b.burned).toBe(3942);
+    expect(b.deficit).toBe(1942);
     expect(b.resting).toBe(1799);
-    expect(b.burned).toBe(2399);
-    expect(b.deficit).toBe(399);
-    expect(b.missing).toEqual([]);
   });
 
-  it("negative deficit is a surplus", () => {
-    expect(energyBalance({ ...base, eatenKcal: 3000 }).deficit).toBe(-601);
+  it("falls back to estimated resting burn when no watch total is entered", () => {
+    const b = energyBalance(base);
+    expect(b.source).toBe("estimate");
+    expect(b.burned).toBe(1799);
+    expect(b.deficit).toBe(-201);
   });
 
-  it("reports missing body stats and leaves totals null", () => {
-    const b = energyBalance({ ...base, heightCm: null, birthYear: null });
+  it("watch total works even without body stats", () => {
+    const b = energyBalance({ ...base, heightCm: null, birthYear: null, watchKcal: 3000 });
+    expect(b.deficit).toBe(1000);
     expect(b.missing).toEqual(["height", "birth_year"]);
-    expect(b.resting).toBeNull();
+  });
+
+  it("is unknown with no watch total and no body stats", () => {
+    const b = energyBalance({ ...base, weightKg: null });
+    expect(b.source).toBeNull();
     expect(b.deficit).toBeNull();
-    expect(b.eaten).toBe(2000);
+    expect(b.missing).toEqual(["weight"]);
   });
 });
 

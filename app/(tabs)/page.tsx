@@ -204,7 +204,7 @@ function TodayCard({ data, today }: { data: Dashboard | null; today: string }) {
           <Big>{log.steps.toLocaleString("en-SG")}</Big>
           <div className="mt-1 text-[13px] text-ios-label2">steps</div>
           <div className="mt-1.5 text-[15px] font-semibold tabular-nums text-ios-orange">
-            {log.kcal_burned.toLocaleString("en-SG")} active kcal
+            {log.kcal_burned.toLocaleString("en-SG")} kcal
           </div>
         </>
       )}
@@ -255,12 +255,12 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
       weightKg: weightOn(data.weights, today),
       heightCm: data.goals?.height_cm ?? null,
       birthYear: data.goals?.birth_year ?? null,
-      activeKcal: data.logs.find((l) => l.date === today)?.kcal_burned ?? 0,
+      watchKcal: data.logs.find((l) => l.date === today)?.kcal_burned ?? 0,
       eatenKcal: data.eatenToday,
     });
     body =
       b.deficit == null ? (
-        <Empty>Add your body stats and a weigh-in to see today&apos;s deficit.</Empty>
+        <Empty>Enter your Polar calories on Today to see your deficit.</Empty>
       ) : (
         <div className="flex items-end justify-between gap-3">
           <div>
@@ -270,7 +270,10 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
             </div>
           </div>
           <div className="text-right text-[13px] leading-5 text-ios-label2 tabular-nums">
-            <div>Burned {b.burned!.toLocaleString("en-SG")}</div>
+            <div>
+              Burned {b.burned!.toLocaleString("en-SG")}
+              {b.source === "estimate" ? " (est.)" : ""}
+            </div>
             <div>Eaten {b.eaten.toLocaleString("en-SG")}</div>
           </div>
         </div>

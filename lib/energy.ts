@@ -1,4 +1,6 @@
-// Daily energy balance: burned (resting + active) minus eaten.
+// Daily energy balance: burned minus eaten.
+// Burned is the watch's total calories (Polar's daily "Calories" already includes resting burn).
+// Until a total is entered, an estimated resting burn stands in so the number is still meaningful.
 
 /** Mifflin-St Jeor resting burn for men, in kcal/day. The app uses the male IPPT tables, so male is assumed. */
 export function restingKcal(weightKg: number, heightCm: number, age: number): number {
@@ -17,18 +19,21 @@ export interface EnergyInputs {
   weightKg: number | null;
   heightCm: number | null;
   birthYear: number | null;
-  /** Active calories from a watch/phone (resting burn is added on top). */
-  activeKcal: number;
+  /** Total calories burned from the watch, including resting burn. 0 = not entered. */
+  watchKcal: number;
   eatenKcal: number;
 }
 
 export interface EnergyBalance {
+  /** Where `burned` came from. */
+  source: "watch" | "estimate" | null;
+  /** Estimated resting burn for the whole day, when body stats are known. */
   resting: number | null;
-  active: number;
   burned: number | null;
   eaten: number;
-  /** burned − eaten: positive is a deficit, negative a surplus. Null until body stats are set. */
+  /** burned − eaten: positive is a deficit, negative a surplus. Null when burned is unknown. */
   deficit: number | null;
+  /** Body stats still needed for the resting-burn fallback. */
   missing: MissingStat[];
 }
 
@@ -38,10 +43,12 @@ export function energyBalance(i: EnergyInputs): EnergyBalance {
   if (i.heightCm == null) missing.push("height");
   if (i.birthYear == null) missing.push("birth_year");
   const resting = missing.length === 0 ? restingKcal(i.weightKg!, i.heightCm!, ageOn(i.birthYear!, i.date)) : null;
-  const burned = resting == null ? null : resting + i.activeKcal;
+
+  const source = i.watchKcal > 0 ? "watch" : resting != null ? "estimate" : null;
+  const burned = source === "watch" ? i.watchKcal : resting;
   return {
+    source,
     resting,
-    active: i.activeKcal,
     burned,
     eaten: i.eatenKcal,
     deficit: burned == null ? null : burned - i.eatenKcal,
