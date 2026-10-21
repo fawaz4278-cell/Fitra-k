@@ -1,5 +1,5 @@
-import { LargeTitle } from "@/components/ui";
+import { WeightScreen } from "@/components/weight/WeightScreen";
 
-export default function Page() {
-  return <LargeTitle title="Weight" />;
+export default function WeightPage() {
+  return <WeightScreen />;
 }

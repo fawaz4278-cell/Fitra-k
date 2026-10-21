@@ -1,5 +1,5 @@
-import { LargeTitle } from "@/components/ui";
+import { IpptScreen } from "@/components/ippt/IpptScreen";
 
-export default function Page() {
-  return <LargeTitle title="IPPT" />;
+export default function IpptPage() {
+  return <IpptScreen />;
 }
