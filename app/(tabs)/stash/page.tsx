@@ -1,5 +1,5 @@
-import { LargeTitle } from "@/components/ui";
+import { StashScreen } from "@/components/stash/StashScreen";
 
-export default function Page() {
-  return <LargeTitle title="Stash" />;
+export default function StashPage() {
+  return <StashScreen />;
 }

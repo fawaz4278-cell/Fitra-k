@@ -1,5 +1,5 @@
-import { LargeTitle } from "@/components/ui";
+import { TodayScreen } from "@/components/today/TodayScreen";
 
-export default function Page() {
-  return <LargeTitle title="Today" />;
+export default function TodayPage() {
+  return <TodayScreen />;
 }
