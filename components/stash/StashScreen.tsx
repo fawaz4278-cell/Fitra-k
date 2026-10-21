@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { formatShortDate, todayISO } from "@/lib/date";
 import type { StashItem } from "@/lib/types";
@@ -10,7 +10,6 @@ import { StashItemRow } from "./StashItemRow";
 import { addToTally, readTally } from "./tally";
 
 export function StashScreen() {
-  const supabase = useRef(createClient()).current;
   const today = todayISO();
   const [items, setItems] = useState<StashItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +20,7 @@ export function StashScreen() {
 
   useEffect(() => {
     setTonight(readTally(today));
-    supabase
+    createClient()
       .from("stash_items")
       .select("*")
       .order("booking_start", { ascending: false })
@@ -31,7 +30,7 @@ export function StashScreen() {
         setItems((data as StashItem[]) ?? []);
         setLoading(false);
       });
-  }, [supabase, today]);
+  }, [today]);
 
   const bookings = useMemo(() => {
     const dates = Array.from(new Set(items.map((i) => i.booking_start)));
@@ -50,7 +49,7 @@ export function StashScreen() {
     // Optimistic update.
     setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, qty_left: nextQty } : i)));
     setTonight(addToTally(today, delta === -1 ? item.kcal_per_unit : -item.kcal_per_unit));
-    const { error } = await supabase.from("stash_items").update({ qty_left: nextQty }).eq("id", item.id);
+    const { error } = await createClient().from("stash_items").update({ qty_left: nextQty }).eq("id", item.id);
     if (error) {
       setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, qty_left: item.qty_left } : i)));
       setTonight(addToTally(today, delta === -1 ? -item.kcal_per_unit : item.kcal_per_unit));
@@ -63,7 +62,7 @@ export function StashScreen() {
     const prev = items;
     setItems((p) => p.filter((i) => i.booking_start !== date));
     if (selected === date) setSelected(null);
-    const { error } = await supabase.from("stash_items").delete().eq("booking_start", date);
+    const { error } = await createClient().from("stash_items").delete().eq("booking_start", date);
     if (error) {
       setItems(prev);
       setError(error.message);

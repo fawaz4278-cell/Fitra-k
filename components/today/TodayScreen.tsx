@@ -38,7 +38,6 @@ function toUpsert(row: DailyLog): DailyLogUpsert {
 }
 
 export function TodayScreen() {
-  const supabase = useRef(createClient()).current;
   const today = todayISO();
   const [date, setDate] = useState(today);
   const [log, setLog] = useState<DailyLogUpsert>(() => emptyLog(today));
@@ -50,25 +49,25 @@ export function TodayScreen() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-  }, [supabase]);
+    createClient().auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
 
   // Recent logs for the streak.
   useEffect(() => {
-    supabase
+    createClient()
       .from("daily_logs")
       .select("date, half_rice, no_sweet_drinks")
       .gte("date", addDays(today, -120))
       .order("date", { ascending: false })
       .then(({ data }) => setRecent((data as StreakLog[]) ?? []));
-  }, [supabase, today]);
+  }, [today]);
 
   // Load the selected day's row.
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     dirty.current = false;
-    supabase
+    createClient()
       .from("daily_logs")
       .select("*")
       .eq("date", date)
@@ -82,12 +81,12 @@ export function TodayScreen() {
     return () => {
       cancelled = true;
     };
-  }, [supabase, date]);
+  }, [date]);
 
   const save = useCallback(
     async (payload: DailyLogUpsert) => {
       setSaveState("saving");
-      const { error } = await supabase
+      const { error } = await createClient()
         .from("daily_logs")
         .upsert({ ...payload, ...(userId ? { user_id: userId } : {}) }, { onConflict: "user_id,date" });
       if (error) {
@@ -100,7 +99,7 @@ export function TodayScreen() {
         return [{ date: payload.date, half_rice: payload.half_rice, no_sweet_drinks: payload.no_sweet_drinks }, ...rest];
       });
     },
-    [supabase, userId],
+    [userId],
   );
 
   // Debounced autosave.
