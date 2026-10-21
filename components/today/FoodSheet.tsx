@@ -68,7 +68,7 @@ export function FoodSheet({ open, onClose, date, onAdded }: Props) {
 
       {FOOD_PRESETS.map(({ group, items }) => (
         <div key={group} className="mb-5">
-          <h3 className="mb-2 px-1 text-[13px] uppercase text-ios-label2">{group}</h3>
+          <h3 className="mb-2 px-1 eyebrow">{group}</h3>
           <div className="flex flex-wrap gap-2">
             {items.map((f) => (
               <button

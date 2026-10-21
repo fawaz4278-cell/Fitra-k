@@ -151,28 +151,24 @@ export function TodayScreen() {
         }
       />
 
-      <div className="mx-4 mb-4 flex items-center justify-between">
+      <div className="surface mx-4 mb-4 flex items-center justify-between rounded-full p-1.5">
         <button
           type="button"
           onClick={() => switchDate(addDays(date, -1))}
-          className="h-9 w-9 rounded-full bg-ios-card text-[18px] text-ios-blue"
+          className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.07] text-[20px] text-white"
           aria-label="Previous day"
         >
           ‹
         </button>
-        <button
-          type="button"
-          onClick={() => !isToday && switchDate(today)}
-          className="text-[15px] font-semibold"
-        >
-          {isToday ? "Today" : formatShortDate(date, true)}
-          {!isToday && <span className="ml-2 text-[13px] font-normal text-ios-blue">Back to today</span>}
+        <button type="button" onClick={() => !isToday && switchDate(today)} className="text-[15px] font-semibold">
+          {isToday ? `Today · ${formatShortDate(date)}` : formatShortDate(date, true)}
+          {!isToday && <span className="ml-2 text-[13px] font-medium text-ios-blue">Back to today</span>}
         </button>
         <button
           type="button"
           onClick={() => switchDate(addDays(date, 1))}
           disabled={isToday}
-          className="h-9 w-9 rounded-full bg-ios-card text-[18px] text-ios-blue disabled:opacity-30"
+          className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.07] text-[20px] text-white disabled:opacity-25"
           aria-label="Next day"
         >
           ›

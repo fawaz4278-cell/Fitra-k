@@ -4,4 +4,7 @@ export { Stepper } from "./Stepper";
 export { Toggle } from "./Toggle";
 export { LargeTitle } from "./LargeTitle";
 export { Section, Row, Card } from "./Card";
+export { Ring } from "./Ring";
+export { Sparkline } from "./Sparkline";
 export { TabBar } from "./TabBar";
+export { FlameIcon } from "./FlameIcon";

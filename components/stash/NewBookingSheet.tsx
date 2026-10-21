@@ -84,7 +84,7 @@ export function NewBookingSheet({
         </button>
       }
     >
-      <div className="mb-5 overflow-hidden rounded-[10px] bg-ios-card2">
+      <div className="mb-5 surface overflow-hidden2">
         <label className="flex min-h-[44px] items-center justify-between px-4">
           <span className="text-[17px]">Booking in</span>
           <input

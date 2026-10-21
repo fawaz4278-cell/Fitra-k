@@ -15,10 +15,10 @@ const WeightTrendChart = dynamic(() => import("./WeightTrendChart"), { ssr: fals
 
 function Stat({ label, value, sub, tone = "" }: { label: string; value: string; sub?: string; tone?: string }) {
   return (
-    <Card className="p-3">
-      <div className="text-[12px] text-ios-label2">{label}</div>
-      <div className={`text-[22px] font-semibold leading-tight ${tone}`}>{value}</div>
-      {sub && <div className="text-[11px] text-ios-label2">{sub}</div>}
+    <Card className="p-3.5">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-white/45">{label}</div>
+      <div className={`num mt-1.5 text-[24px] font-semibold leading-none ${tone}`}>{value}</div>
+      {sub && <div className="mt-1.5 text-[11px] leading-tight text-white/45">{sub}</div>}
     </Card>
   );
 }
@@ -74,7 +74,7 @@ export function WeightScreen() {
           <button
             aria-label="Log weight"
             onClick={() => setLogOpen(true)}
-            className="mb-1 flex h-9 w-9 items-center justify-center rounded-full bg-ios-card text-[24px] leading-none text-ios-blue"
+            className="mb-1 flex h-9 w-9 items-center justify-center pressable rounded-full bg-gradient-to-b from-[#4aa3ff] to-[#0a84ff] text-[24px] leading-none text-white shadow-[0_8px_20px_-6px_rgba(10,132,255,0.8)]"
           >
             +
           </button>
@@ -95,7 +95,7 @@ export function WeightScreen() {
                   label="Per week"
                   value={rate == null ? "—" : `${rate > 0 ? "+" : ""}${rate.toFixed(2)}`}
                   sub={rate == null ? "Need more data" : rate < 0 ? "kg lost/wk" : "kg gained/wk"}
-                  tone={rate == null ? "" : rate <= 0 ? "text-ios-green" : "text-ios-red"}
+                  tone={rate == null ? "" : rate <= 0 ? "text-tint-weight" : "text-ios-orange"}
                 />
                 <Stat
                   label="To target"
@@ -114,7 +114,7 @@ export function WeightScreen() {
               </div>
               {points.length > 1 && (
                 <Card>
-                  <div className="mb-2 text-[15px] font-semibold">Trend</div>
+                  <div className="mb-3 text-[15px] font-semibold">Trend</div>
                   <WeightTrendChart points={points} target={target} />
                 </Card>
               )}
@@ -140,15 +140,15 @@ export function WeightScreen() {
 
           {weights.length > 0 && (
             <section className="mx-4 mb-6">
-              <div className="mb-1.5 flex items-center justify-between px-4">
-                <h2 className="text-[13px] uppercase text-ios-label2">History</h2>
+              <div className="mb-2 flex items-center justify-between px-1">
+                <h2 className="eyebrow">History</h2>
                 <button onClick={() => setEditing((e) => !e)} className="text-[15px] text-ios-blue">
                   {editing ? "Done" : "Edit"}
                 </button>
               </div>
-              <div className="overflow-hidden rounded-[10px] bg-ios-card">
+              <div className="surface overflow-hidden">
                 {weights.map((w) => (
-                  <div key={w.id} className="flex items-center gap-3 border-b border-ios-sep/70 px-4 py-2.5 last:border-b-0">
+                  <div key={w.id} className="flex items-center gap-3 border-b hairline px-4 py-2.5 last:border-b-0">
                     {editing && (
                       <button
                         aria-label="Delete entry"
@@ -162,7 +162,7 @@ export function WeightScreen() {
                       <div className="text-[17px]">{formatShortDate(w.date, true)}</div>
                       {(w.waist_cm != null || w.note) && (
                         <div className="truncate text-[13px] text-ios-label2">
-                          {[w.waist_cm != null ? `Waist ${w.waist_cm} cm` : null, w.note].filter(Boolean).join(" · ")}
+                          {[w.waist_cm != null ? `Waist ${w.waist_cm.toFixed(1)} cm` : null, w.note].filter(Boolean).join(" · ")}
                         </div>
                       )}
                     </div>

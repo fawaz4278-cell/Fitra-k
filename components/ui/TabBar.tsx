@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 const icon = (path: ReactNode) => (
-  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {path}
   </svg>
 );
@@ -63,26 +63,28 @@ const TABS: { href: string; label: string; icon: ReactNode }[] = [
   },
 ];
 
-/** iOS bottom tab bar, translucent with safe-area padding. */
+/** Floating glass tab bar, clear of the home indicator. */
 export function TabBar() {
   const pathname = usePathname();
   return (
     <nav
       aria-label="Tabs"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-[#161616]/80 pb-safe backdrop-blur-xl backdrop-saturate-150"
+      className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+8px)] z-40 mx-auto max-w-md rounded-[30px] border border-white/10 bg-[#141418]/75 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl backdrop-saturate-150"
     >
-      <ul className="mx-auto flex h-[50px] max-w-lg items-stretch">
+      <ul className="flex h-[64px] items-stretch px-1.5">
         {TABS.map((t) => {
           const active = t.href === "/" ? pathname === "/" : pathname === t.href || pathname.startsWith(`${t.href}/`);
           return (
-            <li key={t.href} className="flex-1">
+            <li key={t.href} className="flex-1 py-1.5">
               <Link
                 href={t.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex h-full flex-col items-center justify-center gap-0.5 pt-1 ${active ? "text-ios-blue" : "text-ios-gray"}`}
+                className={`flex h-full flex-col items-center justify-center gap-[3px] rounded-[22px] transition-colors duration-200 ${
+                  active ? "bg-white/[0.09] text-white" : "text-white/45 active:text-white/70"
+                }`}
               >
                 {t.icon}
-                <span className="text-[10px] font-medium leading-none">{t.label}</span>
+                <span className={`text-[10px] leading-none ${active ? "font-semibold" : "font-medium"}`}>{t.label}</span>
               </Link>
             </li>
           );

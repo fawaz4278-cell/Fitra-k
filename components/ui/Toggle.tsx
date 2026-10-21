@@ -15,12 +15,12 @@ export function Toggle({ checked, onChange, label }: ToggleProps) {
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors ${
-        checked ? "bg-ios-green" : "bg-ios-card2"
+      className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 ${
+        checked ? "bg-ios-green" : "bg-white/[0.14]"
       }`}
     >
       <span
-        className={`absolute top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow transition-transform ${
+        className={`absolute left-0 top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,0.35)] transition-transform duration-200 ease-out ${
           checked ? "translate-x-[22px]" : "translate-x-[2px]"
         }`}
       />

@@ -46,7 +46,7 @@ export function PredictionCard({ weights, targetKg }: { weights: { date: string;
   );
 
   if (error) return <p className="mx-4 mb-6 text-[15px] text-ios-red">{error}</p>;
-  if (!p) return <div className="mx-4 mb-6 h-40 animate-pulse rounded-[14px] bg-ios-card" />;
+  if (!p) return <div className="mx-4 mb-6 h-40 animate-pulse surface" />;
 
   // Predicted loss is positive kg lost; show it as a weight change (negative = down).
   const forecast = [{ ...p.current, label: "This week" }, ...p.future.map((w) => ({ ...w, label: weekLabel(w) }))];
@@ -79,7 +79,7 @@ export function PredictionCard({ weights, targetKg }: { weights: { date: string;
                 {forecast.map((w, i) => {
                   const change = w.predictedLossKg == null ? null : -w.predictedLossKg;
                   return (
-                    <tr key={w.start} className="border-t border-ios-sep/70">
+                    <tr key={w.start} className="border-t hairline">
                       <td className="py-2">
                         {w.label}
                         {i === 0 && <div className="text-[11px] text-ios-label2">{w.loggedDays} day{w.loggedDays === 1 ? "" : "s"} logged so far</div>}
@@ -92,7 +92,7 @@ export function PredictionCard({ weights, targetKg }: { weights: { date: string;
               </tbody>
             </table>
             {targetKg != null && (
-              <p className="mt-3 border-t border-ios-sep/70 pt-3 text-[15px]">
+              <p className="mt-3 border-t hairline pt-3 text-[15px]">
                 Target {targetKg.toFixed(1)} kg:{" "}
                 <span className="font-semibold">
                   {p.targetDate === "reached"
@@ -129,7 +129,7 @@ export function PredictionCard({ weights, targetKg }: { weights: { date: string;
               {p.past.map((w) => {
                 const predicted = w.predictedLossKg == null ? null : -w.predictedLossKg;
                 return (
-                  <tr key={w.start} className="border-t border-ios-sep/70">
+                  <tr key={w.start} className="border-t hairline">
                     <td className="py-2">{weekLabel(w)}</td>
                     <td className="py-2 text-right text-ios-label2">{w.loggedDays}/7</td>
                     <td className={`py-2 text-right ${changeTone(predicted)}`}>{changeText(predicted)}</td>

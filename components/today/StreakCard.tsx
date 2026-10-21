@@ -3,7 +3,7 @@
 import type { DailyLog } from "@/lib/types";
 import { addDays, todayISO } from "@/lib/date";
 import { complianceStreak, isCompliant } from "@/lib/streak";
-import { Card } from "@/components/ui";
+import { Card, FlameIcon } from "@/components/ui";
 
 type StreakLog = Pick<DailyLog, "date" | "half_rice" | "no_sweet_drinks">;
 
@@ -16,35 +16,42 @@ export function StreakCard({ logs, today = todayISO() }: { logs: StreakLog[]; to
   const days = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
 
   return (
-    <Card className="mx-4 mb-6">
+    <Card className="mx-4 mb-4 p-5">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-[13px] uppercase text-ios-label2">Compliance streak</div>
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[40px] font-bold leading-none" aria-hidden>
-              {streak > 0 ? "🔥" : "🌱"}
-            </span>
-            <span className="text-[40px] font-bold leading-none tabular-nums">{streak}</span>
-            <span className="text-[17px] text-ios-label2">{streak === 1 ? "day" : "days"}</span>
+          <div className="eyebrow">Compliance streak</div>
+          <div className="mt-2 flex items-end gap-2.5">
+            <FlameIcon lit={streak > 0} size={30} />
+            <span className="num text-[40px] font-semibold leading-none">{streak}</span>
+            <span className="mb-0.5 text-[16px] font-medium text-white/50">{streak === 1 ? "day" : "days"}</span>
           </div>
-          <div className="mt-1 text-[13px] text-ios-label2">Half rice + no sweet drinks</div>
+        </div>
+        <div className="text-right text-[12px] leading-snug text-white/50">
+          Half rice
+          <br />+ no sweet drinks
         </div>
       </div>
-      <div className="mt-4 flex justify-between">
+      <div className="mt-5 flex justify-between">
         {days.map((d) => {
           const log = byDate.get(d);
           const done = log ? isCompliant(log) : false;
           const partial = log ? !done && (log.half_rice || log.no_sweet_drinks) : false;
           const weekday = WEEKDAY[new Date(`${d}T00:00:00Z`).getUTCDay()];
           return (
-            <div key={d} className="flex flex-col items-center gap-1.5">
+            <div key={d} className="flex flex-col items-center gap-2">
               <span
-                className={`h-3.5 w-3.5 rounded-full ${
-                  done ? "bg-ios-green" : partial ? "bg-ios-orange" : "bg-ios-card2"
-                } ${d === today ? "ring-2 ring-white/70 ring-offset-2 ring-offset-ios-card" : ""}`}
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-[13px] ${
+                  done
+                    ? "bg-gradient-to-b from-[#ffb340] to-[#ff6a1f] text-black shadow-[0_4px_14px_-2px_rgba(255,122,47,0.7)]"
+                    : partial
+                      ? "bg-[#ff7a2f]/20 text-[#ffb340]"
+                      : "bg-white/[0.06] text-white/30"
+                } ${d === today ? "ring-2 ring-white/60 ring-offset-2 ring-offset-[#0e0e11]" : ""}`}
                 title={d}
-              />
-              <span className={`text-[11px] ${d === today ? "text-white" : "text-ios-label2"}`}>{weekday}</span>
+              >
+                {done ? "✓" : partial ? "½" : ""}
+              </span>
+              <span className={`text-[11px] font-medium ${d === today ? "text-white" : "text-white/40"}`}>{weekday}</span>
             </div>
           );
         })}

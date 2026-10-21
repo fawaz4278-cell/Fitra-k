@@ -10,29 +10,19 @@ interface StepperProps {
   decimals?: number;
 }
 
-/** iOS-style −/+ stepper. */
+const btn =
+  "flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] text-[20px] leading-none text-white transition active:scale-90 active:bg-white/[0.16] disabled:opacity-25";
+
+/** −/+ stepper with round buttons. */
 export function Stepper({ value, onChange, step = 1, min = 0, max = Infinity, decimals = 0 }: StepperProps) {
   const round = (n: number) => Number(n.toFixed(decimals));
   const set = (n: number) => onChange(round(Math.min(max, Math.max(min, n))));
   return (
-    <div className="flex items-center overflow-hidden rounded-[9px] bg-ios-card2">
-      <button
-        type="button"
-        aria-label="Decrease"
-        disabled={value <= min}
-        onClick={() => set(value - step)}
-        className="h-8 w-11 text-[20px] leading-none disabled:opacity-30"
-      >
+    <div className="flex items-center gap-2">
+      <button type="button" aria-label="Decrease" disabled={value <= min} onClick={() => set(value - step)} className={btn}>
         −
       </button>
-      <div className="h-5 w-px bg-ios-sep" />
-      <button
-        type="button"
-        aria-label="Increase"
-        disabled={value >= max}
-        onClick={() => set(value + step)}
-        className="h-8 w-11 text-[20px] leading-none disabled:opacity-30"
-      >
+      <button type="button" aria-label="Increase" disabled={value >= max} onClick={() => set(value + step)} className={btn}>
         +
       </button>
     </div>

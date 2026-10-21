@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Card, LargeTitle, Row, Section } from "@/components/ui";
+import { Card, LargeTitle, Ring, Row, Section } from "@/components/ui";
 import { createClient } from "@/lib/supabase";
 import { formatRunTime, formatShortDate } from "@/lib/date";
 import {
@@ -20,17 +20,28 @@ import { LogIpptSheet } from "./LogIpptSheet";
 
 const IpptTrendChart = dynamic(() => import("./IpptTrendChart"), { ssr: false });
 
+const AWARD_TEXT: Record<IpptAttempt["award"], string> = {
+  gold: "text-ios-yellow",
+  silver: "text-[#d1d1d6]",
+  pass: "text-ios-green",
+  fail: "text-ios-red",
+};
+
 function StationBar({ label, pts, max }: { label: string; pts: number; max: number }) {
   return (
     <div>
-      <div className="mb-1 flex justify-between text-[13px]">
-        <span className="text-ios-label2">{label}</span>
-        <span className="font-semibold">
-          {pts}/{max}
+      <div className="mb-1.5 flex items-baseline justify-between text-[13px]">
+        <span className="text-white/60">{label}</span>
+        <span className="num text-[15px] font-semibold">
+          {pts}
+          <span className="text-[12px] font-medium text-white/40">/{max}</span>
         </span>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-ios-card2">
-        <div className="h-full rounded-full bg-ios-blue" style={{ width: `${(pts / max) * 100}%` }} />
+      <div className="h-2 overflow-hidden rounded-full bg-white/[0.07]">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-[#ffd60a] to-[#ff7a2f] transition-[width] duration-700"
+          style={{ width: `${(pts / max) * 100}%` }}
+        />
       </div>
     </div>
   );
@@ -86,7 +97,7 @@ export function IpptScreen() {
           <button
             aria-label="Log IPPT"
             onClick={() => setLogOpen(true)}
-            className="mb-1 flex h-9 w-9 items-center justify-center rounded-full bg-ios-card text-[24px] leading-none text-ios-blue"
+            className="mb-1 flex h-9 w-9 items-center justify-center pressable rounded-full bg-gradient-to-b from-[#4aa3ff] to-[#0a84ff] text-[24px] leading-none text-white shadow-[0_8px_20px_-6px_rgba(10,132,255,0.8)]"
           >
             +
           </button>
@@ -101,17 +112,25 @@ export function IpptScreen() {
         <>
           {latest ? (
             <div className="mx-4 mb-6 space-y-3">
-              <Card>
-                <div className="mb-4 flex items-start justify-between">
-                  <div>
-                    <div className="text-[13px] text-ios-label2">
-                      Latest · {formatShortDate(latest.date, true)} · {AGE_GROUP_LABELS[latest.age_group]}
+              <Card className="relative overflow-hidden p-5">
+                <div className="pointer-events-none absolute -left-20 -top-24 h-60 w-60 rounded-full bg-[#ffb340]/[0.13] blur-3xl" />
+                <div className="relative mb-5 flex items-center gap-4">
+                  <Ring progress={latest.total / 100} size={108} stroke={10} from="#ffd60a" to="#ff7a2f">
+                    <div className="text-center">
+                      <div className="num text-[34px] font-semibold leading-none">{latest.total}</div>
+                      <div className="mt-0.5 text-[11px] font-medium text-white/45">/ 100</div>
                     </div>
-                    <div className="text-[48px] font-bold leading-tight">{latest.total}</div>
+                  </Ring>
+                  <div className="min-w-0">
+                    <AwardBadge award={latest.award} />
+                    <div className="mt-2 text-[13px] leading-snug text-white/55">
+                      {formatShortDate(latest.date, true)}
+                      <br />
+                      Age group {AGE_GROUP_LABELS[latest.age_group]}
+                    </div>
                   </div>
-                  <AwardBadge award={latest.award} />
                 </div>
-                <div className="space-y-3">
+                <div className="relative space-y-3.5">
                   <StationBar label={`Push-ups · ${latest.pushups}`} pts={latest.pu_pts} max={25} />
                   <StationBar label={`Sit-ups · ${latest.situps}`} pts={latest.su_pts} max={25} />
                   <StationBar label={`2.4 km · ${formatRunTime(latest.run_seconds)}`} pts={latest.run_pts} max={50} />
@@ -120,12 +139,14 @@ export function IpptScreen() {
 
               <Card>
                 <div className="mb-2 flex items-baseline justify-between">
-                  <span className="text-[15px] font-semibold">Target: {AWARD_LABELS[target]}</span>
-                  <span className="text-[13px] text-ios-label2">{targetPts} pts</span>
+                  <span className="text-[15px] font-semibold">Target · {AWARD_LABELS[target]}</span>
+                  <span className="num text-[13px] text-white/50">{targetPts} pts</span>
                 </div>
-                <div className="relative h-2 overflow-hidden rounded-full bg-ios-card2">
+                <div className="relative h-2.5 overflow-hidden rounded-full bg-white/[0.07]">
                   <div
-                    className={`h-full rounded-full ${latest.total >= targetPts ? "bg-ios-green" : "bg-ios-orange"}`}
+                    className={`h-full rounded-full bg-gradient-to-r ${
+                      latest.total >= targetPts ? "from-[#86efac] to-[#30d158]" : "from-[#ffd60a] to-[#ff7a2f]"
+                    }`}
                     style={{ width: `${Math.min(100, (latest.total / targetPts) * 100)}%` }}
                   />
                 </div>
@@ -138,7 +159,7 @@ export function IpptScreen() {
 
               {attempts.length > 1 && (
                 <Card>
-                  <div className="mb-2 text-[15px] font-semibold">Trend</div>
+                  <div className="mb-3 text-[15px] font-semibold">Trend</div>
                   <IpptTrendChart attempts={attempts} target={targetPts} />
                 </Card>
               )}
@@ -167,15 +188,15 @@ export function IpptScreen() {
 
           {attempts.length > 0 && (
             <section className="mx-4 mb-6">
-              <div className="mb-1.5 flex items-center justify-between px-4">
-                <h2 className="text-[13px] uppercase text-ios-label2">History</h2>
+              <div className="mb-2 flex items-center justify-between px-1">
+                <h2 className="eyebrow">History</h2>
                 <button onClick={() => setEditing((e) => !e)} className="text-[15px] text-ios-blue">
                   {editing ? "Done" : "Edit"}
                 </button>
               </div>
-              <div className="overflow-hidden rounded-[10px] bg-ios-card">
+              <div className="surface overflow-hidden">
                 {attempts.map((a) => (
-                  <div key={a.id} className="flex items-center gap-3 border-b border-ios-sep/70 px-4 py-2.5 last:border-b-0">
+                  <div key={a.id} className="flex items-center gap-3 border-b hairline px-4 py-2.5 last:border-b-0">
                     {editing && (
                       <button
                         aria-label="Delete attempt"
@@ -186,14 +207,14 @@ export function IpptScreen() {
                       </button>
                     )}
                     <div className="min-w-0 flex-1">
-                      <div className="text-[17px]">{formatShortDate(a.date, true)}</div>
+                      <div className="text-[16px] font-medium">{formatShortDate(a.date, true)}</div>
                       <div className="text-[13px] text-ios-label2">
                         {a.pushups} PU · {a.situps} SU · {formatRunTime(a.run_seconds)} · {a.pu_pts}/{a.su_pts}/{a.run_pts}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[20px] font-semibold">{a.total}</div>
-                      <div className="text-[11px] text-ios-label2">{AWARD_LABELS[a.award]}</div>
+                      <div className="num text-[22px] font-semibold leading-none">{a.total}</div>
+                      <div className={`mt-1 text-[11px] font-semibold ${AWARD_TEXT[a.award]}`}>{AWARD_LABELS[a.award]}</div>
                     </div>
                   </div>
                 ))}

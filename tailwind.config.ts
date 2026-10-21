@@ -6,15 +6,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // iOS dark system palette
+        // iOS dark system palette, with deeper surfaces.
         ios: {
           bg: "#000000",
-          card: "#1c1c1e",
-          card2: "#2c2c2e",
-          sep: "#38383a",
+          card: "#111114",
+          card2: "#1e1e23",
+          sep: "#2a2a30",
           label: "#ffffff",
-          label2: "rgba(235,235,245,0.6)",
-          label3: "rgba(235,235,245,0.3)",
+          label2: "rgba(235,235,245,0.62)",
+          label3: "rgba(235,235,245,0.32)",
           blue: "#0a84ff",
           green: "#30d158",
           red: "#ff453a",
@@ -23,9 +23,18 @@ const config: Config = {
           purple: "#bf5af2",
           gray: "#8e8e93",
         },
+        // One colour per area of the app, used for icons, rings and charts.
+        tint: {
+          kcal: "#34d399",
+          weight: "#5ac8fa",
+          ippt: "#ffb340",
+          streak: "#ff7a2f",
+          stash: "#c084fc",
+        },
       },
       fontFamily: {
-        sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "system-ui", "sans-serif"],
+        sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "Inter", "system-ui", "sans-serif"],
+        rounded: ["ui-rounded", "SF Pro Rounded", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],
       },
     },
   },

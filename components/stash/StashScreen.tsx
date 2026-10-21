@@ -104,7 +104,7 @@ export function StashScreen() {
         action={
           <button
             onClick={() => setSheetOpen(true)}
-            className="mb-2 rounded-full bg-ios-card px-3.5 py-1.5 text-[15px] font-semibold text-ios-blue"
+            className="pressable mb-1 rounded-full bg-gradient-to-b from-[#d8b4fe] to-[#a855f7] px-4 py-2 text-[15px] font-semibold text-black shadow-[0_8px_20px_-6px_rgba(168,85,247,0.8)]"
           >
             New booking
           </button>
@@ -115,23 +115,29 @@ export function StashScreen() {
 
       <div className="mx-4 mb-6 grid grid-cols-2 gap-3">
         <Card>
-          <div className="text-[13px] uppercase text-ios-label2">Eaten tonight</div>
-          <div className="mt-1 text-[28px] font-bold tabular-nums">
-            {tonight}
-            <span className="ml-1 text-[15px] font-normal text-ios-label2">kcal</span>
+          <div className="eyebrow flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#ff9f0a] shadow-[0_0_8px_#ff9f0a]" />
+            Eaten tonight
+          </div>
+          <div className="num mt-3 text-[32px] font-semibold leading-none">
+            {tonight.toLocaleString("en-SG")}
+            <span className="ml-1 text-[15px] font-medium text-white/50">kcal</span>
           </div>
         </Card>
         <Card>
-          <div className="text-[13px] uppercase text-ios-label2">Items left</div>
-          <div className="mt-1 text-[28px] font-bold tabular-nums">{totalLeft}</div>
-          <div className="text-[13px] text-ios-label2">{kcalLeft} kcal in stash</div>
+          <div className="eyebrow flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-tint-stash shadow-[0_0_8px_#c084fc]" />
+            Items left
+          </div>
+          <div className="num mt-3 text-[32px] font-semibold leading-none">{totalLeft}</div>
+          <div className="mt-1.5 text-[12px] text-white/50">{kcalLeft.toLocaleString("en-SG")} kcal in stash</div>
         </Card>
       </div>
 
       {loading ? (
         <p className="px-4 text-[15px] text-ios-label2">Loading…</p>
       ) : !current ? (
-        <div className="mx-4 rounded-[14px] bg-ios-card p-6 text-center">
+        <div className="mx-4 surface p-6 text-center">
           <p className="text-[17px] font-semibold">No stash yet</p>
           <p className="mt-1 text-[15px] text-ios-label2">
             Log what you bought for this booking and tap items off as you eat them.
