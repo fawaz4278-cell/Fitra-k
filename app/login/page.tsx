@@ -3,14 +3,97 @@
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase";
+import { Segmented } from "@/components/ui";
 
-function LoginForm() {
-  const params = useSearchParams();
-  const [email, setEmail] = useState("");
+const inputClass =
+  "w-full rounded-xl bg-ios-card px-4 py-3.5 text-[17px] text-white placeholder:text-ios-label3 outline-none focus:ring-2 focus:ring-ios-blue";
+const buttonClass =
+  "w-full rounded-xl bg-ios-blue py-3.5 text-[17px] font-semibold text-white disabled:opacity-40";
+
+function PasswordForm({ email, setEmail }: { email: string; setEmail: (v: string) => void }) {
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+
+  async function signIn(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    setInfo("");
+    const { error } = await createClient().auth.signInWithPassword({ email: email.trim(), password });
+    if (error) {
+      setBusy(false);
+      setError(
+        error.message === "Invalid login credentials"
+          ? "Wrong email or password. No password yet? Sign in with an email code, then tap Password on Home."
+          : error.message,
+      );
+    } else {
+      window.location.replace("/");
+    }
+  }
+
+  async function signUp() {
+    setBusy(true);
+    setError("");
+    setInfo("");
+    const { data, error } = await createClient().auth.signUp({
+      email: email.trim(),
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    setBusy(false);
+    if (error) setError(error.message);
+    else if (data.session) window.location.replace("/");
+    else setInfo("Account created. Confirm it from the email we sent, then sign in here.");
+  }
+
+  const ready = email.trim().length > 3 && password.length >= 6;
+
+  return (
+    <form onSubmit={signIn} className="w-full space-y-4">
+      <input
+        type="email"
+        required
+        autoComplete="username"
+        inputMode="email"
+        placeholder="you@example.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className={inputClass}
+      />
+      <input
+        type="password"
+        required
+        autoComplete="current-password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className={inputClass}
+      />
+      <button type="submit" disabled={busy || !ready} className={buttonClass}>
+        {busy ? "Signing in…" : "Sign in"}
+      </button>
+      <button
+        type="button"
+        onClick={signUp}
+        disabled={busy || !ready}
+        className="w-full py-1 text-[15px] text-ios-blue disabled:opacity-40"
+      >
+        New here? Create account
+      </button>
+      {error && <p className="text-center text-[15px] text-ios-red">{error}</p>}
+      {info && <p className="text-center text-[15px] text-ios-green">{info}</p>}
+    </form>
+  );
+}
+
+function CodeForm({ email, setEmail, initialError }: { email: string; setEmail: (v: string) => void; initialError: string }) {
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"email" | "code">("email");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(params.get("error") ? "That link was invalid or expired." : "");
+  const [error, setError] = useState(initialError);
   const [info, setInfo] = useState("");
 
   async function sendEmail(e?: React.FormEvent) {
@@ -45,11 +128,6 @@ function LoginForm() {
       window.location.replace("/");
     }
   }
-
-  const inputClass =
-    "w-full rounded-xl bg-ios-card px-4 py-3.5 text-[17px] text-white placeholder:text-ios-label3 outline-none focus:ring-2 focus:ring-ios-blue";
-  const buttonClass =
-    "w-full rounded-xl bg-ios-blue py-3.5 text-[17px] font-semibold text-white disabled:opacity-40";
 
   if (step === "code") {
     return (
@@ -100,6 +178,31 @@ function LoginForm() {
       </button>
       {error && <p className="text-center text-[15px] text-ios-red">{error}</p>}
     </form>
+  );
+}
+
+function LoginForm() {
+  const params = useSearchParams();
+  const linkError = params.get("error") ? "That link was invalid or expired." : "";
+  const [mode, setMode] = useState<"password" | "code">(linkError ? "code" : "password");
+  const [email, setEmail] = useState("");
+
+  return (
+    <div className="w-full space-y-5">
+      <Segmented
+        options={[
+          { value: "password", label: "Password" },
+          { value: "code", label: "Email code" },
+        ]}
+        value={mode}
+        onChange={setMode}
+      />
+      {mode === "password" ? (
+        <PasswordForm email={email} setEmail={setEmail} />
+      ) : (
+        <CodeForm email={email} setEmail={setEmail} initialError={linkError} />
+      )}
+    </div>
   );
 }
 
