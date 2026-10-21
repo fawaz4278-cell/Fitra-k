@@ -9,6 +9,7 @@ import type { Goals, Weight } from "@/lib/types";
 import { LogWeightSheet } from "./LogWeightSheet";
 import { TargetWeightSheet } from "./TargetWeightSheet";
 import { weeklyRate, withMovingAverage } from "./stats";
+import { PredictionCard } from "./PredictionCard";
 
 const WeightTrendChart = dynamic(() => import("./WeightTrendChart"), { ssr: false });
 
@@ -126,6 +127,8 @@ export function WeightScreen() {
               </Card>
             </div>
           )}
+
+          <PredictionCard weights={weights} targetKg={target} />
 
           <Section header="Goal">
             <button className="block w-full text-left" onClick={() => setTargetOpen(true)}>
