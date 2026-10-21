@@ -7,7 +7,6 @@ import type { StashItem } from "@/lib/types";
 import { Card, LargeTitle, Row, Section } from "@/components/ui";
 import { NewBookingSheet } from "./NewBookingSheet";
 import { StashItemRow } from "./StashItemRow";
-import { addToTally, readTally } from "./tally";
 
 export function StashScreen() {
   const today = todayISO();
@@ -19,7 +18,12 @@ export function StashScreen() {
   const [tonight, setTonight] = useState(0);
 
   useEffect(() => {
-    setTonight(readTally(today));
+    createClient()
+      .from("food_logs")
+      .select("kcal")
+      .eq("date", today)
+      .not("stash_item_id", "is", null)
+      .then(({ data }) => setTonight((data ?? []).reduce((s, f) => s + f.kcal, 0)));
     createClient()
       .from("stash_items")
       .select("*")
@@ -43,17 +47,41 @@ export function StashScreen() {
   const totalLeft = currentItems.reduce((s, i) => s + i.qty_left, 0);
   const kcalLeft = currentItems.reduce((s, i) => s + i.qty_left * i.kcal_per_unit, 0);
 
+  // Eating an item also logs it as food for today, so it counts towards the calorie balance.
+  // Putting one back removes the most recent such entry from today, if there is one.
   async function changeQty(item: StashItem, delta: 1 | -1) {
     const nextQty = item.qty_left + delta;
     if (nextQty < 0 || nextQty > item.qty_bought) return;
+    const supabase = createClient();
     // Optimistic update.
     setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, qty_left: nextQty } : i)));
-    setTonight(addToTally(today, delta === -1 ? item.kcal_per_unit : -item.kcal_per_unit));
-    const { error } = await createClient().from("stash_items").update({ qty_left: nextQty }).eq("id", item.id);
-    if (error) {
+    const revert = (message: string) => {
       setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, qty_left: item.qty_left } : i)));
-      setTonight(addToTally(today, delta === -1 ? -item.kcal_per_unit : item.kcal_per_unit));
-      setError(error.message);
+      setError(message);
+    };
+
+    const { error } = await supabase.from("stash_items").update({ qty_left: nextQty }).eq("id", item.id);
+    if (error) return revert(error.message);
+
+    if (delta === -1) {
+      const { error: logError } = await supabase
+        .from("food_logs")
+        .insert({ date: today, name: item.name, kcal: item.kcal_per_unit, stash_item_id: item.id });
+      if (logError) return setError(logError.message);
+      setTonight((t) => t + item.kcal_per_unit);
+    } else {
+      const { data: last } = await supabase
+        .from("food_logs")
+        .select("id, kcal")
+        .eq("date", today)
+        .eq("stash_item_id", item.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!last) return;
+      const { error: delError } = await supabase.from("food_logs").delete().eq("id", last.id);
+      if (delError) return setError(delError.message);
+      setTonight((t) => Math.max(0, t - last.kcal));
     }
   }
 

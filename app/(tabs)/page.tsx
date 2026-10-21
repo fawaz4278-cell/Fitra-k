@@ -5,13 +5,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import { createClient } from "@/lib/supabase";
 import { addDays, daysBetween, formatShortDate, todayISO } from "@/lib/date";
 import { complianceStreak } from "@/lib/streak";
+import { energyBalance, weightOn } from "@/lib/energy";
 import { AWARD_LABELS, type DailyLog, type Goals, type IpptAttempt, type IpptAward, type StashItem, type Weight } from "@/lib/types";
 import { LargeTitle } from "@/components/ui";
 
 interface Dashboard {
   ippt: IpptAttempt | null;
   weights: Pick<Weight, "date" | "kg">[];
-  goals: Pick<Goals, "target_kg"> | null;
+  goals: Pick<Goals, "target_kg" | "height_cm" | "birth_year"> | null;
+  eatenToday: number;
   logs: Pick<DailyLog, "date" | "steps" | "kcal_burned" | "half_rice" | "no_sweet_drinks">[];
   stash: Pick<StashItem, "booking_start" | "qty_left">[];
 }
@@ -33,14 +35,15 @@ export default function HomePage() {
   useEffect(() => {
     const supabase = createClient();
     (async () => {
-      const [ippt, weights, goals, logs, stash] = await Promise.all([
+      const [ippt, weights, goals, logs, stash, food] = await Promise.all([
         supabase.from("ippt_attempts").select("*").order("date", { ascending: false }).order("created_at", { ascending: false }).limit(1).maybeSingle(),
         supabase.from("weights").select("date, kg").gte("date", addDays(today, -60)).order("date", { ascending: false }).order("created_at", { ascending: false }),
-        supabase.from("goals").select("target_kg").maybeSingle(),
+        supabase.from("goals").select("target_kg, height_cm, birth_year").maybeSingle(),
         supabase.from("daily_logs").select("date, steps, kcal_burned, half_rice, no_sweet_drinks").gte("date", addDays(today, -365)).order("date", { ascending: false }),
         supabase.from("stash_items").select("booking_start, qty_left").order("booking_start", { ascending: false }),
+        supabase.from("food_logs").select("kcal").eq("date", today),
       ]);
-      const err = ippt.error ?? weights.error ?? goals.error ?? logs.error ?? stash.error;
+      const err = ippt.error ?? weights.error ?? goals.error ?? logs.error ?? stash.error ?? food.error;
       if (err) {
         setError(err.message);
         return;
@@ -48,7 +51,14 @@ export default function HomePage() {
       setData({
         ippt: ippt.data as IpptAttempt | null,
         weights: (weights.data ?? []).map((w) => ({ date: w.date, kg: Number(w.kg) })),
-        goals: goals.data ? { target_kg: goals.data.target_kg == null ? null : Number(goals.data.target_kg) } : null,
+        goals: goals.data
+          ? {
+              target_kg: goals.data.target_kg == null ? null : Number(goals.data.target_kg),
+              height_cm: goals.data.height_cm == null ? null : Number(goals.data.height_cm),
+              birth_year: goals.data.birth_year,
+            }
+          : null,
+        eatenToday: (food.data ?? []).reduce((sum, f) => sum + f.kcal, 0),
         logs: logs.data ?? [],
         stash: stash.data ?? [],
       });
@@ -65,6 +75,7 @@ export default function HomePage() {
       ) : (
         <div className="grid grid-cols-2 gap-3 px-4">
           <IpptCard data={data} />
+          <BalanceCard data={data} today={today} />
           <WeightCard data={data} today={today} />
           <TodayCard data={data} today={today} />
           <StreakCard data={data} today={today} />
@@ -193,7 +204,7 @@ function TodayCard({ data, today }: { data: Dashboard | null; today: string }) {
           <Big>{log.steps.toLocaleString("en-SG")}</Big>
           <div className="mt-1 text-[13px] text-ios-label2">steps</div>
           <div className="mt-1.5 text-[15px] font-semibold tabular-nums text-ios-orange">
-            {log.kcal_burned.toLocaleString("en-SG")} kcal
+            {log.kcal_burned.toLocaleString("en-SG")} active kcal
           </div>
         </>
       )}
@@ -232,6 +243,42 @@ function StashCard({ data }: { data: Dashboard | null }) {
           <div className="mt-1.5 text-[13px] text-ios-label2">Booking {formatShortDate(latest)}</div>
         </>
       )}
+    </Tile>
+  );
+}
+
+function BalanceCard({ data, today }: { data: Dashboard | null; today: string }) {
+  let body: ReactNode = <Skeleton lines={2} />;
+  if (data) {
+    const b = energyBalance({
+      date: today,
+      weightKg: weightOn(data.weights, today),
+      heightCm: data.goals?.height_cm ?? null,
+      birthYear: data.goals?.birth_year ?? null,
+      activeKcal: data.logs.find((l) => l.date === today)?.kcal_burned ?? 0,
+      eatenKcal: data.eatenToday,
+    });
+    body =
+      b.deficit == null ? (
+        <Empty>Add your body stats and a weigh-in to see today&apos;s deficit.</Empty>
+      ) : (
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <Big unit="kcal">{Math.abs(b.deficit).toLocaleString("en-SG")}</Big>
+            <div className={`mt-1.5 text-[17px] font-semibold ${b.deficit >= 0 ? "text-ios-green" : "text-ios-orange"}`}>
+              {b.deficit >= 0 ? "Deficit" : "Surplus"}
+            </div>
+          </div>
+          <div className="text-right text-[13px] leading-5 text-ios-label2 tabular-nums">
+            <div>Burned {b.burned!.toLocaleString("en-SG")}</div>
+            <div>Eaten {b.eaten.toLocaleString("en-SG")}</div>
+          </div>
+        </div>
+      );
+  }
+  return (
+    <Tile href="/today" title="Calorie balance" wide>
+      {body}
     </Tile>
   );
 }

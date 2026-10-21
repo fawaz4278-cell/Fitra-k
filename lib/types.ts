@@ -98,7 +98,19 @@ export interface Goals {
   target_kg: number | null;
   ippt_target: IpptTarget;
   age_group: AgeGroup | null;
+  height_cm: number | null;
+  birth_year: number | null;
   updated_at: string;
+}
+
+export interface FoodLog {
+  id: string;
+  user_id: string;
+  date: string;
+  name: string;
+  kcal: number;
+  stash_item_id: string | null;
+  created_at: string;
 }
 
 /** Insert payloads: server fills id, user_id (default auth.uid()), timestamps. */
@@ -107,6 +119,7 @@ export type WeightInsert = Omit<Weight, "id" | "user_id" | "created_at">;
 export type DailyLogUpsert = Omit<DailyLog, "id" | "user_id" | "created_at" | "updated_at">;
 export type StashItemInsert = Omit<StashItem, "id" | "user_id" | "created_at">;
 export type GoalsUpsert = Omit<Goals, "user_id" | "updated_at">;
+export type FoodLogInsert = Omit<FoodLog, "id" | "user_id" | "created_at">;
 
 /** Result of lib/ippt/score.ts `score()`. */
 export interface IpptScore {

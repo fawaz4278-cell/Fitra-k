@@ -7,6 +7,7 @@ import type { DailyLog, DailyLogUpsert } from "@/lib/types";
 import { LargeTitle, Row, Section, Toggle } from "@/components/ui";
 import { NumberStepRow } from "./NumberStepRow";
 import { StreakCard } from "./StreakCard";
+import { EnergyCard } from "./EnergyCard";
 
 type StreakLog = Pick<DailyLog, "date" | "half_rice" | "no_sweet_drinks">;
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -180,11 +181,13 @@ export function TodayScreen() {
 
       <StreakCard logs={recent} today={today} />
 
+      <EnergyCard date={date} activeKcal={log.kcal_burned} />
+
       <div className={loading ? "pointer-events-none opacity-50" : ""}>
         <Section header="Activity">
           <NumberStepRow label="Steps" value={log.steps} onChange={(v) => update("steps", v)} step={500} max={200000} />
           <NumberStepRow
-            label="Calories burned"
+            label="Active calories"
             unit="kcal"
             value={log.kcal_burned}
             onChange={(v) => update("kcal_burned", v)}
