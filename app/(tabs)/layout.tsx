@@ -1,3 +1,10 @@
+import { TabBar } from "@/components/ui/TabBar";
+
 export default function TabsLayout({ children }: { children: React.ReactNode }) {
-  return <div className="pb-[calc(env(safe-area-inset-bottom)+60px)]">{children}</div>;
+  return (
+    <>
+      <main className="min-h-[100dvh] pb-[calc(env(safe-area-inset-bottom)+66px)]">{children}</main>
+      <TabBar />
+    </>
+  );
 }
