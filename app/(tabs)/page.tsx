@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { createClient } from "@/lib/supabase";
-import { addDays, daysBetween, formatShortDate, todayISO } from "@/lib/date";
+import { addDays, dayFractionSG, daysBetween, formatShortDate, todayISO } from "@/lib/date";
 import { complianceStreak } from "@/lib/streak";
 import { energyBalance, weightOn } from "@/lib/energy";
 import { AWARD_LABELS, type DailyLog, type Goals, type IpptAttempt, type IpptAward, type StashItem, type Weight } from "@/lib/types";
@@ -257,6 +257,7 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
       birthYear: data.goals?.birth_year ?? null,
       watchKcal: data.logs.find((l) => l.date === today)?.kcal_burned ?? 0,
       eatenKcal: data.eatenToday,
+      dayFraction: dayFractionSG(),
     });
     body =
       b.deficit == null ? (
@@ -272,7 +273,7 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
           <div className="text-right text-[13px] leading-5 text-ios-label2 tabular-nums">
             <div>
               Burned {b.burned!.toLocaleString("en-SG")}
-              {b.source === "estimate" ? " (est.)" : ""}
+              {b.source === "estimate" ? " so far (est.)" : ""}
             </div>
             <div>Eaten {b.eaten.toLocaleString("en-SG")}</div>
           </div>

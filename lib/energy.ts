@@ -22,6 +22,8 @@ export interface EnergyInputs {
   /** Total calories burned from the watch, including resting burn. 0 = not entered. */
   watchKcal: number;
   eatenKcal: number;
+  /** Share of the day elapsed (0–1). The resting estimate only counts burn so far; defaults to the whole day. */
+  dayFraction?: number;
 }
 
 export interface EnergyBalance {
@@ -45,7 +47,8 @@ export function energyBalance(i: EnergyInputs): EnergyBalance {
   const resting = missing.length === 0 ? restingKcal(i.weightKg!, i.heightCm!, ageOn(i.birthYear!, i.date)) : null;
 
   const source = i.watchKcal > 0 ? "watch" : resting != null ? "estimate" : null;
-  const burned = source === "watch" ? i.watchKcal : resting;
+  const fraction = Math.min(1, Math.max(0, i.dayFraction ?? 1));
+  const burned = source === "watch" ? i.watchKcal : resting == null ? null : Math.round(resting * fraction);
   return {
     source,
     resting,

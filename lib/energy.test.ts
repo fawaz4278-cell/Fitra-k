@@ -32,6 +32,17 @@ describe("energyBalance", () => {
     expect(b.deficit).toBe(-201);
   });
 
+  it("only counts resting burn so far for a day in progress", () => {
+    const b = energyBalance({ ...base, eatenKcal: 0, dayFraction: 0.25 });
+    expect(b.burned).toBe(450);
+    expect(b.deficit).toBe(450);
+    expect(b.resting).toBe(1799);
+  });
+
+  it("day fraction doesn't affect the watch total", () => {
+    expect(energyBalance({ ...base, watchKcal: 3000, dayFraction: 0.25 }).burned).toBe(3000);
+  });
+
   it("watch total works even without body stats", () => {
     const b = energyBalance({ ...base, heightCm: null, birthYear: null, watchKcal: 3000 });
     expect(b.deficit).toBe(1000);
@@ -58,5 +69,13 @@ describe("weightOn", () => {
   });
   it("is null before the first weigh-in", () => {
     expect(weightOn(weights, "2026-10-01")).toBeNull();
+  });
+});
+
+describe("dayFractionSG", () => {
+  it("reads the Singapore clock", async () => {
+    const { dayFractionSG } = await import("./date");
+    expect(dayFractionSG(new Date("2026-10-21T22:00:00Z"))).toBeCloseTo(0.25); // 06:00 SGT
+    expect(dayFractionSG(new Date("2026-10-21T16:00:00Z"))).toBe(0); // 00:00 SGT
   });
 });

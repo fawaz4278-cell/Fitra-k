@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Row, Section } from "@/components/ui";
 import { createClient } from "@/lib/supabase";
 import { energyBalance } from "@/lib/energy";
+import { dayFractionSG, todayISO } from "@/lib/date";
 import { BodyStatsSheet } from "./BodyStatsSheet";
 import { FoodSheet } from "./FoodSheet";
 import { useEnergy } from "./useEnergy";
@@ -26,6 +27,7 @@ export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: numbe
     birthYear: energy.birthYear,
     watchKcal,
     eatenKcal: eaten,
+    dayFraction: date === todayISO() ? dayFractionSG() : 1,
   });
 
   async function removeFood(id: string) {
@@ -80,7 +82,7 @@ export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: numbe
           <div>
             <div className="text-[17px] font-semibold tabular-nums">{b.burned == null ? "–" : fmt(b.burned)}</div>
             <div className="text-[12px] text-ios-label2">
-              {b.source === "watch" ? "Burned (Polar)" : b.source === "estimate" ? "Burned (estimate)" : "Burned"}
+              {b.source === "watch" ? "Burned (Polar)" : b.source === "estimate" ? "Burned so far (est.)" : "Burned"}
             </div>
           </div>
           <div>
@@ -90,7 +92,7 @@ export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: numbe
         </div>
         {b.source === "estimate" && (
           <p className="mt-3 text-[13px] text-ios-label2">
-            Resting burn only. Enter your Polar total calories under Activity for the real number.
+            Estimated resting burn so far. Enter your Polar total calories under Activity for the real number.
           </p>
         )}
       </div>

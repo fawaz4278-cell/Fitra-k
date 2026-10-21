@@ -7,6 +7,13 @@ export function todayISO(now: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: APP_TZ }).format(now);
 }
 
+/** Fraction of the Singapore day elapsed so far, 0–1 (e.g. 0.25 at 6am). */
+export function dayFractionSG(now: Date = new Date()): number {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: APP_TZ, hour: "numeric", minute: "numeric", hourCycle: "h23" }).formatToParts(now);
+  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
+  return (get("hour") * 60 + get("minute")) / 1440;
+}
+
 /** Add (or subtract) whole days to a YYYY-MM-DD string. */
 export function addDays(iso: string, days: number): string {
   const d = new Date(`${iso}T00:00:00Z`);
