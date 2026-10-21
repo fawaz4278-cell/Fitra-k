@@ -23,13 +23,12 @@ export const AGE_GROUP_LABELS: Record<AgeGroup, string> = {
   14: "58-60",
 };
 
-export type IpptAward = "gold" | "silver" | "incentive" | "pass" | "fail";
-export type IpptTarget = "pass" | "incentive" | "silver" | "gold";
+export type IpptAward = "gold" | "silver" | "pass" | "fail";
+export type IpptTarget = "pass" | "silver" | "gold";
 
 export const AWARD_LABELS: Record<IpptAward, string> = {
   gold: "Gold",
   silver: "Silver",
-  incentive: "Pass (Incentive)",
   pass: "Pass",
   fail: "Fail",
 };
@@ -38,8 +37,7 @@ export const AWARD_LABELS: Record<IpptAward, string> = {
 export const AWARD_THRESHOLDS: Record<IpptTarget, number> = {
   gold: 85,
   silver: 75,
-  incentive: 61,
-  pass: 51,
+  pass: 61,
 };
 
 export interface IpptAttempt {

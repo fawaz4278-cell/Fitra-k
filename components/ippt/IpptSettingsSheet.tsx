@@ -7,7 +7,6 @@ import { AGE_GROUPS, AGE_GROUP_LABELS, AWARD_THRESHOLDS, type AgeGroup, type Ipp
 
 const TARGETS: { value: IpptTarget; label: string }[] = [
   { value: "pass", label: "Pass" },
-  { value: "incentive", label: "Incentive" },
   { value: "silver", label: "Silver" },
   { value: "gold", label: "Gold" },
 ];

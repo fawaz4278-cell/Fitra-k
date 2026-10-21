@@ -19,8 +19,7 @@ interface Dashboard {
 const AWARD_COLORS: Record<IpptAward, string> = {
   gold: "text-ios-yellow",
   silver: "text-[#d1d1d6]",
-  incentive: "text-ios-green",
-  pass: "text-ios-blue",
+  pass: "text-ios-green",
   fail: "text-ios-red",
 };
 

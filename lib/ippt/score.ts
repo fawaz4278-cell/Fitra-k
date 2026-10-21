@@ -41,7 +41,6 @@ export function runPoints(ageGroup: AgeGroup, runSeconds: number): number {
 export function awardFor(total: number): IpptAward {
   if (total >= AWARD_THRESHOLDS.gold) return "gold";
   if (total >= AWARD_THRESHOLDS.silver) return "silver";
-  if (total >= AWARD_THRESHOLDS.incentive) return "incentive";
   if (total >= AWARD_THRESHOLDS.pass) return "pass";
   return "fail";
 }

@@ -76,16 +76,16 @@ describe("score() totals and awards", () => {
     expect(score(1, 60, 60, t(11, 40))).toMatchObject({ run_pts: 35, total: 85, award: "gold" });
     expect(score(1, 60, 60, t(11, 50))).toMatchObject({ run_pts: 34, total: 84, award: "silver" });
   });
-  it("75 is silver, 74 is pass with incentive", () => {
+  it("75 is silver, 74 is pass", () => {
     expect(score(1, 60, 60, t(13, 20))).toMatchObject({ run_pts: 25, total: 75, award: "silver" });
-    expect(score(1, 60, 60, t(13, 30))).toMatchObject({ run_pts: 24, total: 74, award: "incentive" });
+    expect(score(1, 60, 60, t(13, 30))).toMatchObject({ run_pts: 24, total: 74, award: "pass" });
   });
-  it("61 is pass with incentive, 60 is pass", () => {
-    expect(score(1, 59, 60, t(15, 0))).toMatchObject({ pu_pts: 24, su_pts: 25, run_pts: 12, total: 61, award: "incentive" });
-    expect(score(1, 60, 60, t(15, 10))).toMatchObject({ run_pts: 10, total: 60, award: "pass" });
+  it("61 is pass, 60 is fail", () => {
+    expect(score(1, 59, 60, t(15, 0))).toMatchObject({ pu_pts: 24, su_pts: 25, run_pts: 12, total: 61, award: "pass" });
+    expect(score(1, 60, 60, t(15, 10))).toMatchObject({ run_pts: 10, total: 60, award: "fail" });
   });
-  it("51 is pass, 50 is fail", () => {
-    expect(score(1, 60, 60, t(16, 0))).toMatchObject({ run_pts: 1, total: 51, award: "pass" });
+  it("51 and 50 are fail", () => {
+    expect(score(1, 60, 60, t(16, 0))).toMatchObject({ run_pts: 1, total: 51, award: "fail" });
     expect(score(1, 60, 60, t(16, 10))).toMatchObject({ run_pts: 0, total: 50, award: "fail" });
   });
   it("no per-station minimum: 0 pts on a station can still pass on total", () => {
@@ -96,7 +96,7 @@ describe("score() totals and awards", () => {
   });
   it("awardFor thresholds", () => {
     expect([85, 84, 75, 74, 61, 60, 51, 50].map(awardFor)).toEqual([
-      "gold", "silver", "silver", "incentive", "incentive", "pass", "pass", "fail",
+      "gold", "silver", "silver", "pass", "pass", "fail", "fail", "fail",
     ]);
   });
   it("nextAwardGap", () => {

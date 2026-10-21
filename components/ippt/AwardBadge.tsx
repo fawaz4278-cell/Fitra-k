@@ -3,8 +3,7 @@ import { AWARD_LABELS, type IpptAward } from "@/lib/types";
 const COLORS: Record<IpptAward, string> = {
   gold: "bg-ios-yellow/20 text-ios-yellow",
   silver: "bg-white/15 text-white",
-  incentive: "bg-ios-green/20 text-ios-green",
-  pass: "bg-ios-blue/20 text-ios-blue",
+  pass: "bg-ios-green/20 text-ios-green",
   fail: "bg-ios-red/20 text-ios-red",
 };
 
