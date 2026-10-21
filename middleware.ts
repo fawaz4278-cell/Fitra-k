@@ -1,8 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login"];
-
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -28,20 +26,20 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
-  const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
-
-  if (!user && !isPublic) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
-  if (user && path === "/login") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    url.search = "";
-    return NextResponse.redirect(url);
+  // Single-user app with no login screen: sign the owner in automatically using
+  // server-only credentials. They never reach the browser bundle.
+  if (!user) {
+    const email = process.env.FITRACK_EMAIL;
+    const password = process.env.FITRACK_PASSWORD;
+    if (!email || !password) {
+      return new NextResponse("Fitrack isn't set up: add FITRACK_EMAIL and FITRACK_PASSWORD in Vercel.", {
+        status: 500,
+      });
+    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return new NextResponse(`Fitrack couldn't sign in: ${error.message}`, { status: 500 });
+    }
   }
 
   return response;

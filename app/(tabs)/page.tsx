@@ -7,7 +7,6 @@ import { addDays, daysBetween, formatShortDate, todayISO } from "@/lib/date";
 import { complianceStreak } from "@/lib/streak";
 import { AWARD_LABELS, type DailyLog, type Goals, type IpptAttempt, type IpptAward, type StashItem, type Weight } from "@/lib/types";
 import { LargeTitle } from "@/components/ui";
-import { SetPasswordSheet } from "@/components/account/SetPasswordSheet";
 
 interface Dashboard {
   ippt: IpptAttempt | null;
@@ -29,7 +28,6 @@ const fmtKg = (n: number) => Number(n).toFixed(1);
 export default function HomePage() {
   const [data, setData] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [passwordOpen, setPasswordOpen] = useState(false);
   const today = todayISO();
 
   useEffect(() => {
@@ -59,20 +57,7 @@ export default function HomePage() {
 
   return (
     <>
-      <LargeTitle
-        title="Home"
-        action={
-          <div className="mb-1.5 flex items-center gap-4 text-[15px] text-ios-blue">
-            <button type="button" onClick={() => setPasswordOpen(true)}>
-              Password
-            </button>
-            <form action="/auth/signout" method="post">
-              <button type="submit">Sign out</button>
-            </form>
-          </div>
-        }
-      />
-      <SetPasswordSheet open={passwordOpen} onClose={() => setPasswordOpen(false)} />
+      <LargeTitle title="Home" />
       <p className="-mt-1 mb-4 px-4 text-[15px] text-ios-label2">{formatShortDate(today, true)}</p>
 
       {error ? (
