@@ -11,7 +11,7 @@ interface StepperProps {
 }
 
 const btn =
-  "flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] text-[20px] leading-none text-white transition active:scale-90 active:bg-white/[0.16] disabled:opacity-25";
+  "flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] text-[20px] leading-none text-white [transition:transform_450ms_var(--spring-bouncy),background-color_200ms] active:scale-[0.82] active:bg-white/[0.18] active:[transition-duration:90ms] disabled:opacity-25";
 
 /** −/+ stepper with round buttons. */
 export function Stepper({ value, onChange, step = 1, min = 0, max = Infinity, decimals = 0 }: StepperProps) {

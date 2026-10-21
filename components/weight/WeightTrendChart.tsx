@@ -44,7 +44,7 @@ export default function WeightTrendChart({ points, target }: { points: WeightPoi
               formatter={(v, name) => [`${Number(v).toFixed(1)} kg`, name === "avg7" ? "7-day avg" : "Weight"]}
             />
             {target != null && <ReferenceLine y={target} stroke="#34d399" strokeOpacity={0.6} strokeDasharray="3 5" />}
-            <Area type="monotone" dataKey="avg7" stroke="#5ac8fa" strokeWidth={3} fill="url(#weightFill)" dot={false} isAnimationActive={false} />
+            <Area type="monotone" dataKey="avg7" stroke="#5ac8fa" strokeWidth={3} fill="url(#weightFill)" dot={false} animationDuration={1400} animationEasing="ease-out" />
             <Line type="monotone" dataKey="kg" stroke="none" dot={{ r: 2.5, fill: "rgba(255,255,255,0.55)", strokeWidth: 0 }} activeDot={{ r: 4 }} isAnimationActive={false} />
           </ComposedChart>
         </ResponsiveContainer>

@@ -8,3 +8,4 @@ export { Ring } from "./Ring";
 export { Sparkline } from "./Sparkline";
 export { TabBar } from "./TabBar";
 export { FlameIcon } from "./FlameIcon";
+export { CountUp, useCountUp, useMounted } from "./motion";

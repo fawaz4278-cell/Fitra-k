@@ -46,7 +46,7 @@ export function PredictionCard({ weights, targetKg }: { weights: { date: string;
   );
 
   if (error) return <p className="mx-4 mb-6 text-[15px] text-ios-red">{error}</p>;
-  if (!p) return <div className="mx-4 mb-6 h-40 animate-pulse surface" />;
+  if (!p) return <div className="shimmer mx-4 mb-6 h-40 rounded-[22px]" />;
 
   // Predicted loss is positive kg lost; show it as a weight change (negative = down).
   const forecast = [{ ...p.current, label: "This week" }, ...p.future.map((w) => ({ ...w, label: weekLabel(w) }))];

@@ -59,7 +59,8 @@ export default function IpptTrendChart({ attempts, target }: { attempts: IpptAtt
             fill="url(#ipptFill)"
             dot={{ r: 4, fill: "#0e0e11", stroke: "#ffb340", strokeWidth: 2 }}
             activeDot={{ r: 6, fill: "#ffb340", stroke: "#0e0e11", strokeWidth: 2 }}
-            isAnimationActive={false}
+            animationDuration={1400}
+            animationEasing="ease-out"
           />
         </AreaChart>
       </ResponsiveContainer>

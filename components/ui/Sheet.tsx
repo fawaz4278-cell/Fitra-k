@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 interface SheetProps {
   open: boolean;
@@ -11,8 +11,21 @@ interface SheetProps {
   children: ReactNode;
 }
 
-/** iOS-style bottom sheet with Cancel / title / action header. */
+const EXIT_MS = 240;
+
+/** iOS-style bottom sheet with Cancel / title / action header. Springs up on open and slides away on close. */
 export function Sheet({ open, onClose, title, action, children }: SheetProps) {
+  // Stay mounted briefly after closing so the exit animation can play.
+  const [rendered, setRendered] = useState(open);
+  useEffect(() => {
+    if (open) {
+      setRendered(true);
+      return;
+    }
+    const t = setTimeout(() => setRendered(false), EXIT_MS);
+    return () => clearTimeout(t);
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -25,14 +38,23 @@ export function Sheet({ open, onClose, title, action, children }: SheetProps) {
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!rendered) return null;
+  const closing = !open;
   return (
     <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true" aria-label={title}>
-      <button aria-label="Close" className="absolute inset-0 bg-black/70 backdrop-blur-[2px] animate-fade-in" onClick={onClose} />
-      <div className="relative flex max-h-[92dvh] w-full flex-col rounded-t-[28px] border-t border-white/10 bg-[#121215] shadow-[0_-20px_60px_rgba(0,0,0,0.6)] animate-sheet-up">
+      <button
+        aria-label="Close"
+        className={`absolute inset-0 bg-black/70 backdrop-blur-[3px] ${closing ? "animate-fade-out" : "animate-fade-in"}`}
+        onClick={onClose}
+      />
+      <div
+        className={`relative flex max-h-[92dvh] w-full flex-col rounded-t-[28px] border-t border-white/10 bg-[#121215] shadow-[0_-20px_60px_rgba(0,0,0,0.6)] ${
+          closing ? "animate-sheet-down" : "animate-sheet-up"
+        }`}
+      >
         <div className="mx-auto mt-2.5 h-[5px] w-10 rounded-full bg-white/20" />
         <div className="grid grid-cols-[1fr_auto_1fr] items-center px-5 py-3.5">
-          <button onClick={onClose} className="justify-self-start text-[16px] text-white/60">
+          <button onClick={onClose} className="justify-self-start text-[16px] text-white/60 transition-opacity active:opacity-50">
             Cancel
           </button>
           <h2 className="justify-self-center text-[17px] font-semibold">{title}</h2>

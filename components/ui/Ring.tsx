@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useMounted } from "./motion";
 
 interface RingProps {
   /** 0–1 */
@@ -15,7 +18,8 @@ interface RingProps {
 export function Ring({ progress, size = 72, stroke = 8, from, to, children }: RingProps) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const p = Math.min(1, Math.max(0, progress));
+  const mounted = useMounted(120);
+  const p = mounted ? Math.min(1, Math.max(0, progress)) : 0;
   const id = `ring-${from.slice(1)}-${to.slice(1)}`;
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -37,7 +41,7 @@ export function Ring({ progress, size = 72, stroke = 8, from, to, children }: Ri
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={c * (1 - p)}
-          style={{ transition: "stroke-dashoffset 900ms cubic-bezier(0.2,0.8,0.2,1)" }}
+          style={{ transition: "stroke-dashoffset 1400ms cubic-bezier(0.16,1,0.3,1)" }}
         />
       </svg>
       {children && <div className="absolute inset-0 flex items-center justify-center">{children}</div>}

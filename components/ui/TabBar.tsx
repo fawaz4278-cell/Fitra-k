@@ -63,33 +63,53 @@ const TABS: { href: string; label: string; icon: ReactNode }[] = [
   },
 ];
 
-/** Floating glass tab bar, clear of the home indicator. */
+/** Floating glass tab bar, clear of the home indicator. The highlight pill springs between tabs. */
 export function TabBar() {
   const pathname = usePathname();
+  const activeIndex = TABS.findIndex((t) =>
+    t.href === "/" ? pathname === "/" : pathname === t.href || pathname.startsWith(`${t.href}/`),
+  );
   return (
     <nav
       aria-label="Tabs"
       className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+8px)] z-40 mx-auto max-w-md rounded-[30px] border border-white/10 bg-[#141418]/75 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl backdrop-saturate-150"
     >
-      <ul className="flex h-[64px] items-stretch px-1.5">
-        {TABS.map((t) => {
-          const active = t.href === "/" ? pathname === "/" : pathname === t.href || pathname.startsWith(`${t.href}/`);
-          return (
-            <li key={t.href} className="flex-1 py-1.5">
-              <Link
-                href={t.href}
-                aria-current={active ? "page" : undefined}
-                className={`flex h-full flex-col items-center justify-center gap-[3px] rounded-[22px] transition-colors duration-200 ${
-                  active ? "bg-white/[0.09] text-white" : "text-white/45 active:text-white/70"
-                }`}
-              >
-                {t.icon}
-                <span className={`text-[10px] leading-none ${active ? "font-semibold" : "font-medium"}`}>{t.label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="relative h-[64px] px-1.5">
+        {activeIndex >= 0 && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-y-1.5 left-1.5 w-[calc((100%-12px)/5)] [transition:transform_650ms_var(--spring)]"
+            style={{ transform: `translateX(${activeIndex * 100}%)` }}
+          >
+            <div className="h-full rounded-[22px] bg-white/[0.1] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" />
+          </div>
+        )}
+        <ul className="relative flex h-full items-stretch">
+          {TABS.map((t, i) => {
+            const active = i === activeIndex;
+            return (
+              <li key={t.href} className="flex-1 py-1.5">
+                <Link
+                  href={t.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`group flex h-full flex-col items-center justify-center gap-[3px] rounded-[22px] transition-colors duration-300 ${
+                    active ? "text-white" : "text-white/45"
+                  }`}
+                >
+                  <span
+                    className={`[transition:transform_500ms_var(--spring-bouncy)] group-active:scale-[0.82] group-active:[transition-duration:100ms] ${
+                      active ? "-translate-y-px scale-105" : ""
+                    }`}
+                  >
+                    {t.icon}
+                  </span>
+                  <span className={`text-[10px] leading-none ${active ? "font-semibold" : "font-medium"}`}>{t.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </nav>
   );
 }

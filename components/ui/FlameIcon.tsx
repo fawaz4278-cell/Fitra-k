@@ -1,7 +1,7 @@
 /** Gradient flame for streaks; dimmed when the streak is 0. */
 export function FlameIcon({ lit, size = 26 }: { lit: boolean; size?: number }) {
   return (
-    <svg width={size} height={(size * 30) / 26} viewBox="0 0 24 28" aria-hidden="true" className={lit ? "drop-shadow-[0_0_10px_rgba(255,122,47,0.6)]" : "opacity-30"}>
+    <svg width={size} height={(size * 30) / 26} viewBox="0 0 24 28" aria-hidden="true" className={lit ? "animate-flicker drop-shadow-[0_0_10px_rgba(255,122,47,0.6)]" : "opacity-30"}>
       <defs>
         <linearGradient id="flame" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#ffd60a" />

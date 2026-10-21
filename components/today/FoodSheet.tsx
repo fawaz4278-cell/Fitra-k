@@ -63,7 +63,12 @@ export function FoodSheet({ open, onClose, date, onAdded }: Props) {
       }
     >
       <p className="mb-4 h-5 px-1 text-[13px] text-ios-green" aria-live="polite">
-        {added.length > 0 ? `Added: ${added.join(", ")}` : ""}
+        {added.length > 0 && (
+          <span key={added.length} className="animate-pop inline-block">
+            ✓ Added {added[added.length - 1]}
+            {added.length > 1 ? ` · ${added.length} items` : ""}
+          </span>
+        )}
       </p>
 
       {FOOD_PRESETS.map(({ group, items }) => (
@@ -76,7 +81,7 @@ export function FoodSheet({ open, onClose, date, onAdded }: Props) {
                 type="button"
                 disabled={busy}
                 onClick={() => add(f.name, f.kcal)}
-                className="rounded-full bg-ios-card2 px-3.5 py-2 text-[15px] active:bg-ios-sep disabled:opacity-50"
+                className="pressable rounded-full bg-white/[0.07] px-3.5 py-2 text-[15px] active:bg-white/[0.14] disabled:opacity-50"
               >
                 {f.name} <span className="text-ios-label2">{f.kcal}</span>
               </button>

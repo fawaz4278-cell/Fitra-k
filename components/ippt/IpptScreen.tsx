@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Card, LargeTitle, Ring, Row, Section } from "@/components/ui";
+import { Card, CountUp, LargeTitle, Ring, Row, Section, useMounted } from "@/components/ui";
 import { createClient } from "@/lib/supabase";
 import { formatRunTime, formatShortDate } from "@/lib/date";
 import {
@@ -27,7 +27,8 @@ const AWARD_TEXT: Record<IpptAttempt["award"], string> = {
   fail: "text-ios-red",
 };
 
-function StationBar({ label, pts, max }: { label: string; pts: number; max: number }) {
+function StationBar({ label, pts, max, i }: { label: string; pts: number; max: number; i: number }) {
+  const mounted = useMounted(200 + i * 120);
   return (
     <div>
       <div className="mb-1.5 flex items-baseline justify-between text-[13px]">
@@ -39,8 +40,8 @@ function StationBar({ label, pts, max }: { label: string; pts: number; max: numb
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-white/[0.07]">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#ffd60a] to-[#ff7a2f] transition-[width] duration-700"
-          style={{ width: `${(pts / max) * 100}%` }}
+          className="h-full rounded-full bg-gradient-to-r from-[#ffd60a] to-[#ff7a2f] [transition:width_1200ms_cubic-bezier(0.16,1,0.3,1)]"
+          style={{ width: `${mounted ? (pts / max) * 100 : 0}%` }}
         />
       </div>
     </div>
@@ -113,11 +114,11 @@ export function IpptScreen() {
           {latest ? (
             <div className="mx-4 mb-6 space-y-3">
               <Card className="relative overflow-hidden p-5">
-                <div className="pointer-events-none absolute -left-20 -top-24 h-60 w-60 rounded-full bg-[#ffb340]/[0.13] blur-3xl" />
+                <div className="animate-float-slow pointer-events-none absolute -left-20 -top-24 h-60 w-60 rounded-full bg-[#ffb340]/[0.13] blur-3xl" />
                 <div className="relative mb-5 flex items-center gap-4">
                   <Ring progress={latest.total / 100} size={108} stroke={10} from="#ffd60a" to="#ff7a2f">
                     <div className="text-center">
-                      <div className="num text-[34px] font-semibold leading-none">{latest.total}</div>
+                      <div className="num text-[34px] font-semibold leading-none"><CountUp value={latest.total} /></div>
                       <div className="mt-0.5 text-[11px] font-medium text-white/45">/ 100</div>
                     </div>
                   </Ring>
@@ -131,9 +132,9 @@ export function IpptScreen() {
                   </div>
                 </div>
                 <div className="relative space-y-3.5">
-                  <StationBar label={`Push-ups · ${latest.pushups}`} pts={latest.pu_pts} max={25} />
-                  <StationBar label={`Sit-ups · ${latest.situps}`} pts={latest.su_pts} max={25} />
-                  <StationBar label={`2.4 km · ${formatRunTime(latest.run_seconds)}`} pts={latest.run_pts} max={50} />
+                  <StationBar i={0} label={`Push-ups · ${latest.pushups}`} pts={latest.pu_pts} max={25} />
+                  <StationBar i={1} label={`Sit-ups · ${latest.situps}`} pts={latest.su_pts} max={25} />
+                  <StationBar i={2} label={`2.4 km · ${formatRunTime(latest.run_seconds)}`} pts={latest.run_pts} max={50} />
                 </div>
               </Card>
 

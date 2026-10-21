@@ -7,7 +7,7 @@ import { addDays, dayFractionSG, daysBetween, formatShortDate, todayISO } from "
 import { complianceStreak, isCompliant } from "@/lib/streak";
 import { energyBalance, weightOn } from "@/lib/energy";
 import { AWARD_LABELS, type DailyLog, type Goals, type IpptAttempt, type IpptAward, type StashItem, type Weight } from "@/lib/types";
-import { FlameIcon, LargeTitle, Ring, Sparkline } from "@/components/ui";
+import { CountUp, FlameIcon, LargeTitle, Ring, Sparkline, useMounted } from "@/components/ui";
 
 interface Dashboard {
   ippt: IpptAttempt | null;
@@ -121,7 +121,7 @@ function TileLabel({ color, children }: { color: string; children: ReactNode }) 
 }
 
 function Skeleton({ h = 72 }: { h?: number }) {
-  return <div className="animate-pulse rounded-xl bg-white/[0.05]" style={{ height: h }} aria-label="Loading" />;
+  return <div className="shimmer rounded-xl" style={{ height: h }} aria-label="Loading" />;
 }
 
 function BalanceCard({ data, today }: { data: Dashboard | null; today: string }) {
@@ -139,12 +139,13 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
     : null;
   const deficit = b?.deficit ?? null;
   const good = deficit != null && deficit >= 0;
-  const eatenShare = b?.burned ? Math.min(1, b.eaten / b.burned) : 0;
+  const mounted = useMounted(250);
+  const eatenShare = mounted && b?.burned ? Math.min(1, b.eaten / b.burned) : 0;
 
   return (
     <Tile href="/today" i={0} className="relative overflow-hidden p-5">
       <div
-        className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full blur-3xl"
+        className="animate-float pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full blur-3xl"
         style={{ background: good ? "rgba(52,211,153,0.16)" : "rgba(255,159,10,0.14)" }}
       />
       <div className="relative">
@@ -175,7 +176,7 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
                     : "linear-gradient(180deg,#ffd8a8 0%,#ff9f0a 100%)",
                 }}
               >
-                {fmt(Math.abs(deficit))}
+                <CountUp value={Math.abs(deficit)} />
               </span>
               <span className="text-[17px] font-medium text-white/60">kcal {good ? "deficit" : "surplus"}</span>
             </div>
@@ -183,12 +184,14 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
             <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-white/[0.07]">
               <div className="flex h-full">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#ffb340] to-[#ff7a2f] transition-[width] duration-700"
+                  className="h-full rounded-full bg-gradient-to-r from-[#ffb340] to-[#ff7a2f] [transition:width_1200ms_cubic-bezier(0.16,1,0.3,1)]"
                   style={{ width: `${eatenShare * 100}%` }}
                 />
                 {good && (
                   <div
-                    className="ml-0.5 h-full flex-1 rounded-full bg-gradient-to-r from-[#34d399] to-[#10b981] opacity-90"
+                    className={`ml-0.5 h-full flex-1 rounded-full bg-gradient-to-r from-[#34d399] to-[#10b981] transition-opacity delay-500 duration-700 ${
+                      mounted ? "opacity-90" : "opacity-0"
+                    }`}
                   />
                 )}
               </div>
@@ -196,10 +199,10 @@ function BalanceCard({ data, today }: { data: Dashboard | null; today: string })
             <div className="mt-2.5 flex justify-between text-[13px] text-white/55">
               <span>
                 <span className="mr-1 inline-block h-2 w-2 rounded-full bg-[#ff9f0a]" />
-                Eaten <span className="num font-semibold text-white/85">{fmt(b!.eaten)}</span>
+                Eaten <span className="num font-semibold text-white/85"><CountUp value={b!.eaten} /></span>
               </span>
               <span>
-                Burned <span className="num font-semibold text-white/85">{fmt(b!.burned!)}</span>
+                Burned <span className="num font-semibold text-white/85"><CountUp value={b!.burned!} /></span>
                 {b!.source === "estimate" ? " (est.)" : ""}
               </span>
             </div>
@@ -238,7 +241,7 @@ function WeightTile({ data }: { data: Dashboard | null }) {
       ) : (
         <>
           <div className="num text-[32px] font-semibold leading-none">
-            {fmtKg(latest.kg)}
+            <CountUp value={latest.kg} decimals={1} />
             <span className="ml-1 text-[15px] font-medium text-white/50">kg</span>
           </div>
           {change != null && (
@@ -271,7 +274,7 @@ function IpptTile({ data }: { data: Dashboard | null }) {
         <>
           <div className="flex items-center gap-3">
             <Ring progress={a.total / 100} size={64} stroke={7} from="#ffd60a" to="#ff7a2f">
-              <span className="num text-[20px] font-semibold">{a.total}</span>
+              <span className="num text-[20px] font-semibold"><CountUp value={a.total} /></span>
             </Ring>
             <div className="min-w-0">
               <div className={`text-[17px] font-semibold leading-tight ${AWARD_COLORS[a.award]}`}>{AWARD_LABELS[a.award]}</div>
@@ -312,7 +315,7 @@ function StreakTile({ data, today }: { data: Dashboard | null; today: string }) 
           <div className="flex items-end gap-2">
             <FlameIcon lit={streak > 0} />
             <div className="num text-[32px] font-semibold leading-none">
-              {streak}
+              <CountUp value={streak} duration={800} />
               <span className="ml-1 text-[15px] font-medium text-white/50">{streak === 1 ? "day" : "days"}</span>
             </div>
           </div>
@@ -324,7 +327,8 @@ function StreakTile({ data, today }: { data: Dashboard | null; today: string }) 
               return (
                 <span
                   key={d}
-                  className={`h-2.5 w-2.5 rounded-full ${
+                  style={{ "--i": week.indexOf(d) + 3 } as CSSProperties}
+                  className={`animate-rise h-2.5 w-2.5 rounded-full ${
                     full ? "bg-gradient-to-b from-[#ffb340] to-[#ff7a2f] shadow-[0_0_6px_rgba(255,122,47,0.7)]" : half ? "bg-[#ff7a2f]/35" : "bg-white/10"
                   } ${d === today ? "ring-2 ring-white/40 ring-offset-2 ring-offset-[#0e0e11]" : ""}`}
                 />
@@ -339,6 +343,7 @@ function StreakTile({ data, today }: { data: Dashboard | null; today: string }) 
 }
 
 function StashTile({ data }: { data: Dashboard | null }) {
+  const mounted = useMounted(300);
   const latest = data?.stash[0]?.booking_start;
   const items = latest ? data!.stash.filter((s) => s.booking_start === latest) : [];
   const left = items.reduce((sum, s) => sum + s.qty_left, 0);
@@ -353,13 +358,13 @@ function StashTile({ data }: { data: Dashboard | null }) {
       ) : (
         <>
           <div className="num text-[32px] font-semibold leading-none">
-            {left}
+            <CountUp value={left} duration={800} />
             <span className="ml-1 text-[15px] font-medium text-white/50">left</span>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.07]">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#e9d5ff] to-[#a855f7]"
-              style={{ width: `${bought ? (left / bought) * 100 : 0}%` }}
+              className="h-full rounded-full bg-gradient-to-r from-[#e9d5ff] to-[#a855f7] [transition:width_1200ms_cubic-bezier(0.16,1,0.3,1)]"
+              style={{ width: `${mounted && bought ? (left / bought) * 100 : 0}%` }}
             />
           </div>
           <div className="mt-3 text-[12px] text-white/50">

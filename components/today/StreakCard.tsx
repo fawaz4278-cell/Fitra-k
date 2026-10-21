@@ -1,9 +1,10 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { DailyLog } from "@/lib/types";
 import { addDays, todayISO } from "@/lib/date";
 import { complianceStreak, isCompliant } from "@/lib/streak";
-import { Card, FlameIcon } from "@/components/ui";
+import { Card, CountUp, FlameIcon } from "@/components/ui";
 
 type StreakLog = Pick<DailyLog, "date" | "half_rice" | "no_sweet_drinks">;
 
@@ -22,7 +23,7 @@ export function StreakCard({ logs, today = todayISO() }: { logs: StreakLog[]; to
           <div className="eyebrow">Compliance streak</div>
           <div className="mt-2 flex items-end gap-2.5">
             <FlameIcon lit={streak > 0} size={30} />
-            <span className="num text-[40px] font-semibold leading-none">{streak}</span>
+            <span className="num text-[40px] font-semibold leading-none"><CountUp value={streak} duration={800} /></span>
             <span className="mb-0.5 text-[16px] font-medium text-white/50">{streak === 1 ? "day" : "days"}</span>
           </div>
         </div>
@@ -32,13 +33,13 @@ export function StreakCard({ logs, today = todayISO() }: { logs: StreakLog[]; to
         </div>
       </div>
       <div className="mt-5 flex justify-between">
-        {days.map((d) => {
+        {days.map((d, i) => {
           const log = byDate.get(d);
           const done = log ? isCompliant(log) : false;
           const partial = log ? !done && (log.half_rice || log.no_sweet_drinks) : false;
           const weekday = WEEKDAY[new Date(`${d}T00:00:00Z`).getUTCDay()];
           return (
-            <div key={d} className="flex flex-col items-center gap-2">
+            <div key={d} className="animate-rise flex flex-col items-center gap-2" style={{ "--i": i + 1 } as CSSProperties}>
               <span
                 className={`flex h-8 w-8 items-center justify-center rounded-full text-[13px] ${
                   done

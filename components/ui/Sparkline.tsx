@@ -1,3 +1,7 @@
+"use client";
+
+import { useMounted } from "./motion";
+
 interface SparklineProps {
   values: number[];
   color: string;
@@ -7,6 +11,7 @@ interface SparklineProps {
 
 /** Tiny trend line with a soft gradient fill. Needs at least two values. */
 export function Sparkline({ values, color, width = 140, height = 40 }: SparklineProps) {
+  const mounted = useMounted(200);
   if (values.length < 2) return null;
   const min = Math.min(...values);
   const max = Math.max(...values);
@@ -27,8 +32,20 @@ export function Sparkline({ values, color, width = 140, height = 40 }: Sparkline
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={area} fill={`url(#${id})`} />
-      <path d={line} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      <path d={area} fill={`url(#${id})`} style={{ opacity: mounted ? 1 : 0, transition: "opacity 900ms ease 500ms" }} />
+      <path
+        d={line}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+        pathLength={1}
+        strokeDasharray={1}
+        strokeDashoffset={mounted ? 0 : 1}
+        style={{ transition: "stroke-dashoffset 1300ms cubic-bezier(0.16,1,0.3,1)" }}
+      />
     </svg>
   );
 }

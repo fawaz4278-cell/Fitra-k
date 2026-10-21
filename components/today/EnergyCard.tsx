@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Row, Section } from "@/components/ui";
+import { CountUp, Row, Section } from "@/components/ui";
 import { createClient } from "@/lib/supabase";
 import { energyBalance } from "@/lib/energy";
 import { dayFractionSG, todayISO } from "@/lib/date";
@@ -47,7 +47,7 @@ export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: numbe
     <>
       <div className="surface relative mx-4 mb-7 overflow-hidden p-5">
         <div
-          className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full blur-3xl"
+          className="animate-float pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full blur-3xl"
           style={{ background: b.deficit != null && b.deficit < 0 ? "rgba(255,159,10,0.14)" : "rgba(52,211,153,0.15)" }}
         />
         <div className="relative">
@@ -62,7 +62,7 @@ export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: numbe
           </div>
 
           {!energy.loaded ? (
-            <div className="mt-3 h-14 w-44 animate-pulse rounded-xl bg-white/[0.05]" />
+            <div className="shimmer mt-3 h-14 w-44 rounded-xl" />
           ) : b.deficit == null ? (
             <div className="mt-3 space-y-2 text-[15px] text-ios-label2">
               <p>Enter your Polar total calories under Activity, or for an estimate add:</p>
@@ -88,7 +88,7 @@ export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: numbe
                       : "linear-gradient(180deg,#ffd8a8 0%,#ff9f0a 100%)",
                 }}
               >
-                {fmt(Math.abs(b.deficit))}
+                <CountUp value={Math.abs(b.deficit)} />
               </span>
               <span className="text-[16px] font-medium text-white/55">kcal {b.deficit >= 0 ? "deficit" : "surplus"}</span>
             </div>
@@ -99,11 +99,11 @@ export function EnergyCard({ date, watchKcal }: { date: string; watchKcal: numbe
               <div className="text-[12px] text-white/50">
                 {b.source === "watch" ? "Burned · Polar" : b.source === "estimate" ? "Burned so far · est." : "Burned"}
               </div>
-              <div className="num mt-0.5 text-[22px] font-semibold">{b.burned == null ? "–" : fmt(b.burned)}</div>
+              <div className="num mt-0.5 text-[22px] font-semibold">{b.burned == null ? "–" : <CountUp value={b.burned} />}</div>
             </div>
             <div className="rounded-2xl bg-white/[0.05] px-3.5 py-3">
               <div className="text-[12px] text-white/50">Eaten</div>
-              <div className="num mt-0.5 text-[22px] font-semibold">{fmt(b.eaten)}</div>
+              <div className="num mt-0.5 text-[22px] font-semibold"><CountUp value={b.eaten} /></div>
             </div>
           </div>
           {b.source === "estimate" && (

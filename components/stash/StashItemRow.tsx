@@ -1,6 +1,7 @@
 "use client";
 
 import type { StashItem } from "@/lib/types";
+import { useMounted } from "@/components/ui";
 
 /** Tap the row to eat one; the + button puts one back (undo). */
 export function StashItemRow({
@@ -13,7 +14,8 @@ export function StashItemRow({
   onUndo: () => void;
 }) {
   const empty = item.qty_left === 0;
-  const pct = item.qty_bought > 0 ? (item.qty_left / item.qty_bought) * 100 : 0;
+  const mounted = useMounted(150);
+  const pct = mounted && item.qty_bought > 0 ? (item.qty_left / item.qty_bought) * 100 : 0;
 
   return (
     <div className="hairline flex items-center gap-3 border-b px-4 py-3.5 last:border-b-0">
@@ -21,7 +23,7 @@ export function StashItemRow({
         type="button"
         onClick={onEat}
         disabled={empty}
-        className="min-w-0 flex-1 text-left transition active:scale-[0.98] active:opacity-70 disabled:opacity-40"
+        className="pressable min-w-0 flex-1 text-left disabled:opacity-40"
         aria-label={`Eat one ${item.name}`}
       >
         <div className="flex items-baseline justify-between gap-2">
@@ -33,7 +35,7 @@ export function StashItemRow({
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#e9d5ff] to-[#a855f7] transition-[width] duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-[#e9d5ff] to-[#a855f7] [transition:width_900ms_var(--spring)]"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -45,7 +47,7 @@ export function StashItemRow({
         type="button"
         onClick={onUndo}
         disabled={item.qty_left >= item.qty_bought}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.07] text-[18px] text-white/80 transition active:scale-90 disabled:opacity-25"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.07] text-[18px] text-white/80 [transition:transform_450ms_var(--spring-bouncy)] active:scale-[0.82] active:[transition-duration:90ms] disabled:opacity-25"
         aria-label={`Put back one ${item.name}`}
       >
         +

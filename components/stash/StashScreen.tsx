@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { formatShortDate, todayISO } from "@/lib/date";
 import type { StashItem } from "@/lib/types";
-import { Card, LargeTitle, Row, Section } from "@/components/ui";
+import { Card, CountUp, LargeTitle, Row, Section } from "@/components/ui";
 import { NewBookingSheet } from "./NewBookingSheet";
 import { StashItemRow } from "./StashItemRow";
 
@@ -120,7 +120,7 @@ export function StashScreen() {
             Eaten tonight
           </div>
           <div className="num mt-3 text-[32px] font-semibold leading-none">
-            {tonight.toLocaleString("en-SG")}
+            <CountUp value={tonight} duration={700} />
             <span className="ml-1 text-[15px] font-medium text-white/50">kcal</span>
           </div>
         </Card>
@@ -129,7 +129,7 @@ export function StashScreen() {
             <span className="h-1.5 w-1.5 rounded-full bg-tint-stash shadow-[0_0_8px_#c084fc]" />
             Items left
           </div>
-          <div className="num mt-3 text-[32px] font-semibold leading-none">{totalLeft}</div>
+          <div className="num mt-3 text-[32px] font-semibold leading-none"><CountUp value={totalLeft} duration={700} /></div>
           <div className="mt-1.5 text-[12px] text-white/50">{kcalLeft.toLocaleString("en-SG")} kcal in stash</div>
         </Card>
       </div>

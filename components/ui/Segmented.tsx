@@ -18,7 +18,7 @@ export function Segmented<T extends string | number>({ options, value, onChange,
             key={String(o.value)}
             type="button"
             onClick={() => onChange(o.value)}
-            className={`flex-1 whitespace-nowrap rounded-[9px] px-3 py-[7px] text-[13px] font-semibold transition-all duration-200 ${
+            className={`flex-1 whitespace-nowrap rounded-[9px] px-3 py-[7px] text-[13px] font-semibold [transition:background-color_250ms,color_250ms,box-shadow_250ms,transform_450ms_var(--spring-bouncy)] active:scale-95 ${
               o.value === value
                 ? "bg-white/[0.16] text-white shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08)]"
                 : "text-white/55"
