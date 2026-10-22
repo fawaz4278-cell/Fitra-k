@@ -109,6 +109,66 @@ body::before {
   .animate-pop { animation: pop 0.45s var(--spring-bouncy); }
 }
 
+/* Launch splash: matches public/splash/* exactly, then hands off to the app. */
+#splash {
+  display: none;
+}
+@media (display-mode: standalone) {
+  #splash {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 70% at 15% -10%, rgba(10, 132, 255, 0.22), transparent 70%),
+      radial-gradient(50% 60% at 95% -15%, rgba(48, 209, 88, 0.14), transparent 70%),
+      radial-gradient(220px 220px at 50% 46%, rgba(40, 170, 200, 0.16), transparent 70%),
+      #000;
+    animation: splash-out 0.55s var(--ease-out) 0.45s forwards;
+  }
+}
+.splash-mark {
+  position: absolute;
+  left: 50%;
+  top: calc(46% - 48px);
+  width: 96px;
+  height: 96px;
+  margin-left: -48px;
+  border-radius: 22px;
+  animation: splash-mark 0.9s var(--spring) both;
+}
+.splash-word {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(46% + 48px + 22px);
+  text-align: center;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.splash-tag {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 64px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: rgba(235, 235, 245, 0.41);
+}
+@keyframes splash-mark {
+  0% { transform: scale(1); }
+  45% { transform: scale(0.92); }
+  100% { transform: scale(1.06); }
+}
+@keyframes splash-out {
+  to { opacity: 0; transform: scale(1.04); visibility: hidden; }
+}
+
 @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes sheet-down { from { transform: translateY(0); } to { transform: translateY(100%); } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
